@@ -1,6 +1,7 @@
 # EMF Distance Cutoff
 
 A Fabric mod for Minecraft 1.21.11 that lets you disable EMF model rendering beyond a configurable distance.
+### ⚠️This mod is created by AI⚠️
 
 ## Features
 
