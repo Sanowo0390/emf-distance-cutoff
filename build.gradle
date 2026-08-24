@@ -20,7 +20,7 @@ dependencies {
     mappings "net.fabricmc:yarn:${project.yarn_mappings}:v2"
     modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
     modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
-    modImplementation "curse.maven:entity-model-features-fabric-830832:${project.emf_curse_file}"
+    modImplementation "curse.maven:entity-model-features-844662:${project.emf_curse_file}"
     modImplementation "curse.maven:entity-texture-features-fabric-568563:${project.etf_curse_file}"
     modCompileOnly "com.terraformersmc:modmenu:${project.modmenu_version}"
 }
