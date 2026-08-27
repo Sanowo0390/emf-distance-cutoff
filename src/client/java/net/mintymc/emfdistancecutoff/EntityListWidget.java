@@ -15,6 +15,7 @@ import java.util.List;
 import java.util.Locale;
 
 public final class EntityListWidget extends ObjectSelectionList<EntityListWidget.EntityEntry> {
+    private static final int ROW_WIDTH = 700;
     private final ConfigScreen parentScreen;
     private final CutoffConfig config;
 
@@ -22,6 +23,11 @@ public final class EntityListWidget extends ObjectSelectionList<EntityListWidget
         super(minecraft, width, height, y, itemHeight);
         this.parentScreen = parentScreen;
         this.config = CutoffConfig.get();
+    }
+
+    @Override
+    public int getRowWidth() {
+        return Math.min(ROW_WIDTH, Math.max(200, this.width - 40));
     }
 
     public void rebuild(String query) {
@@ -56,10 +62,9 @@ public final class EntityListWidget extends ObjectSelectionList<EntityListWidget
             this.id = id;
         }
 
-        private Component getLabel() {
+        private Component getName() {
             EntityType<?> type = BuiltInRegistries.ENTITY_TYPE.get(id).map(reference -> reference.value()).orElse(null);
-            String name = type != null ? type.getDescription().getString() : id.toString();
-            return Component.literal(name).append(Component.literal("  ")).append(statusText());
+            return type != null ? type.getDescription() : Component.literal(id.toString());
         }
 
         private Component statusText() {
@@ -78,14 +83,24 @@ public final class EntityListWidget extends ObjectSelectionList<EntityListWidget
 
         @Override
         public Component getNarration() {
-            return getLabel();
+            return getName().copy().append(Component.literal(" - ")).append(statusText());
         }
 
         @Override
         public void extractContent(GuiGraphicsExtractor graphics, int mouseX, int mouseY, boolean hovered, float delta) {
-            int x = getContentX() + 4;
-            int y = getContentY() + 3;
-            graphics.text(Minecraft.getInstance().font, getLabel(), x, y, 0xFFFFFFFF, true);
+            int x = getContentX();
+            int y = getContentY();
+            int w = getContentWidth();
+            int h = getContentHeight();
+
+            int background = hovered ? 0xC0383838 : 0xAA1A1A1A;
+            int border = hovered ? 0xFF8A8A8A : 0xFF555555;
+            graphics.fill(x, y, x + w, y + h, background);
+            graphics.fill(x, y, x + w, y + 1, border);
+            graphics.fill(x, y + h - 1, x + w, y + h, border);
+
+            graphics.text(Minecraft.getInstance().font, getName(), x + 10, y + 5, 0xFFFFFFFF, true);
+            graphics.text(Minecraft.getInstance().font, statusText(), x + 10, y + 18, 0xFFB8B8B8, false);
         }
 
         @Override
