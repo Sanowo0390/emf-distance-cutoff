@@ -1,34 +1,82 @@
-@echo off
-setlocal
-set "GRADLE_VERSION=9.5.1"
-set "GRADLE_HOME=%USERPROFILE%\.gradle\wrapper\custom-dists\gradle-%GRADLE_VERSION%"
-set "GRADLE_ZIP=%TEMP%\gradle-%GRADLE_VERSION%-bin.zip"
-set "GRADLE_URL=https://services.gradle.org/distributions/gradle-%GRADLE_VERSION%-bin.zip"
+@rem
+@rem Copyright 2015 the original author or authors.
+@rem
+@rem Licensed under the Apache License, Version 2.0 (the "License");
+@rem you may not use this file except in compliance with the License.
+@rem You may obtain a copy of the License at
+@rem
+@rem      https://www.apache.org/licenses/LICENSE-2.0
+@rem
+@rem Unless required by applicable law or agreed to in writing, software
+@rem distributed under the License is distributed on an "AS IS" BASIS,
+@rem WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+@rem See the License for the specific language governing permissions and
+@rem limitations under the License.
+@rem
+@rem SPDX-License-Identifier: Apache-2.0
+@rem
 
-if exist "%GRADLE_HOME%\bin\gradle.bat" goto run
+@if "%DEBUG%"=="" @echo off
+@rem ##########################################################################
+@rem
+@rem  Gradle startup script for Windows
+@rem
+@rem ##########################################################################
 
-if not exist "%GRADLE_HOME%" mkdir "%GRADLE_HOME%" >nul 2>&1
+@rem Set local scope for the variables, and ensure extensions are enabled
+setlocal EnableExtensions
 
-echo Downloading Gradle %GRADLE_VERSION%...
-powershell -NoProfile -ExecutionPolicy Bypass -Command "Invoke-WebRequest -UseBasicParsing -Uri '%GRADLE_URL%' -OutFile '%GRADLE_ZIP%'"
-if errorlevel 1 (
-  echo Failed to download Gradle %GRADLE_VERSION%.
-  exit /b 1
-)
+set DIRNAME=%~dp0
+if "%DIRNAME%"=="" set DIRNAME=.
+@rem This is normally unused
+set APP_BASE_NAME=%~n0
+set APP_HOME=%DIRNAME%
 
-powershell -NoProfile -ExecutionPolicy Bypass -Command "Expand-Archive -Path '%GRADLE_ZIP%' -DestinationPath '%GRADLE_HOME%' -Force"
-if errorlevel 1 (
-  echo Failed to extract Gradle %GRADLE_VERSION%.
-  exit /b 1
-)
+@rem Resolve any "." and ".." in APP_HOME to make it shorter.
+for %%i in ("%APP_HOME%") do set APP_HOME=%%~fi
 
-if exist "%GRADLE_HOME%\gradle-%GRADLE_VERSION%\bin\gradle.bat" (
-  move /Y "%GRADLE_HOME%\gradle-%GRADLE_VERSION%\*" "%GRADLE_HOME%\" >nul
-  rmdir /S /Q "%GRADLE_HOME%\gradle-%GRADLE_VERSION%" >nul 2>&1
-)
+@rem Add default JVM options here. You can also use JAVA_OPTS and GRADLE_OPTS to pass JVM options to this script.
+set DEFAULT_JVM_OPTS="-Xmx64m" "-Xms64m"
 
-del /Q "%GRADLE_ZIP%" >nul 2>&1
+@rem Find java.exe
+if defined JAVA_HOME goto findJavaFromJavaHome
 
-:run
-call "%GRADLE_HOME%\bin\gradle.bat" %*
-exit /b %ERRORLEVEL%
+set JAVA_EXE=java.exe
+%JAVA_EXE% -version >NUL 2>&1
+if %ERRORLEVEL% equ 0 goto execute
+
+echo. 1>&2
+echo ERROR: JAVA_HOME is not set and no 'java' command could be found in your PATH. 1>&2
+echo. 1>&2
+echo Please set the JAVA_HOME variable in your environment to match the 1>&2
+echo location of your Java installation. 1>&2
+
+"%COMSPEC%" /c exit 1
+
+:findJavaFromJavaHome
+set JAVA_HOME=%JAVA_HOME:"=%
+set JAVA_EXE=%JAVA_HOME%/bin/java.exe
+
+if exist "%JAVA_EXE%" goto execute
+
+echo. 1>&2
+echo ERROR: JAVA_HOME is set to an invalid directory: %JAVA_HOME% 1>&2
+echo. 1>&2
+echo Please set the JAVA_HOME variable in your environment to match the 1>&2
+echo location of your Java installation. 1>&2
+
+"%COMSPEC%" /c exit 1
+
+:execute
+@rem Setup the command line
+
+
+
+@rem Execute Gradle
+@rem endlocal doesn't take effect until after the line is parsed and variables are expanded
+@rem which allows us to clear the local environment before executing the java command
+endlocal & "%JAVA_EXE%" %DEFAULT_JVM_OPTS% %JAVA_OPTS% %GRADLE_OPTS% "-Dorg.gradle.appname=%APP_BASE_NAME%" -jar "%APP_HOME%\gradle\wrapper\gradle-wrapper.jar" %* & call :exitWithErrorLevel
+
+:exitWithErrorLevel
+@rem Use "%COMSPEC%" /c exit to allow operators to work properly in scripts
+"%COMSPEC%" /c exit %ERRORLEVEL%
