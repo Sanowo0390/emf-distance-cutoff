@@ -24,8 +24,8 @@ dependencies {
     implementation "net.fabricmc:fabric-loader:${project.loader_version}"
     implementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_api_version}"
     implementation "com.terraformersmc:modmenu:${project.modmenu_version}"
-    modImplementation "curse.maven:entity-model-features-844662:${project.emf_curse_file}"
-    modImplementation "curse.maven:entity-texture-features-fabric-568563:${project.etf_curse_file}"
+    implementation "curse.maven:entity-model-features-844662:${project.emf_curse_file}"
+    implementation "curse.maven:entity-texture-features-fabric-568563:${project.etf_curse_file}"
 }
 
 processResources {
