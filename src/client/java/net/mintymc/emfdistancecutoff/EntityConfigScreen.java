@@ -14,7 +14,6 @@ public final class EntityConfigScreen extends Screen {
     private final Identifier entityId;
     private final CutoffConfig config;
     private EditBox distanceField;
-    private Button enabledButton;
     private boolean enabled;
     private boolean useGlobal;
 
@@ -26,7 +25,7 @@ public final class EntityConfigScreen extends Screen {
     }
 
     private static Component titleFor(Identifier entityId) {
-        EntityType<?> type = BuiltInRegistries.ENTITY_TYPE.get(entityId);
+        EntityType<?> type = BuiltInRegistries.ENTITY_TYPE.get(entityId).map(reference -> reference.value()).orElse(null);
         return type != null ? type.getDescription() : Component.literal(entityId.toString());
     }
 
@@ -41,7 +40,7 @@ public final class EntityConfigScreen extends Screen {
         int center = this.width / 2;
         int top = this.height / 2 - 96;
 
-        enabledButton = addRenderableWidget(Button.builder(enabledText(), button -> {
+        addRenderableWidget(Button.builder(enabledText(), button -> {
             enabled = !enabled;
             button.setMessage(enabledText());
         }).bounds(center - 110, top + 30, 220, 20).build());
@@ -52,7 +51,6 @@ public final class EntityConfigScreen extends Screen {
         distanceField.setValue(useGlobal
                 ? ConfigScreen.format(config.cutoffDistanceBlocks)
                 : ConfigScreen.format(override.distanceBlocks));
-        distanceField.setFilter(value -> value.matches("[0-9]*([.][0-9]*)?"));
         distanceField.setEditable(!useGlobal);
         addRenderableWidget(distanceField);
 
@@ -65,7 +63,7 @@ public final class EntityConfigScreen extends Screen {
         addRenderableWidget(Button.builder(Component.translatable("emf_distance_cutoff.reset"), button -> {
             config.resetOverride(entityId.toString());
             CutoffConfig.save();
-            if (this.minecraft != null) this.minecraft.gui.setScreen(parent);
+            onClose();
         }).bounds(center - 110, top + 144, 220, 20).build());
 
         addRenderableWidget(Button.builder(Component.translatable("emf_distance_cutoff.save"), button -> save())
