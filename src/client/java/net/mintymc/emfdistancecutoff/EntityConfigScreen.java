@@ -38,19 +38,22 @@ public final class EntityConfigScreen extends Screen {
         useGlobal = override == null || override.distanceBlocks == null;
 
         int center = this.width / 2;
-        int top = this.height / 2 - 96;
+        int fieldWidth = Math.min(320, this.width - 80);
+        int top = Math.max(54, this.height / 2 - 100);
+        int left = center - fieldWidth / 2;
 
         addRenderableWidget(Button.builder(enabledText(), button -> {
             enabled = !enabled;
             button.setMessage(enabledText());
-        }).bounds(center - 110, top + 30, 220, 20).build());
+        }).bounds(left, top + 34, fieldWidth, 20).build());
 
-        distanceField = new EditBox(this.font, center - 100, top + 88, 200, 20,
+        distanceField = new EditBox(this.font, left, top + 94, fieldWidth, 20,
                 Component.translatable("emf_distance_cutoff.custom_distance"));
         distanceField.setMaxLength(12);
         distanceField.setValue(useGlobal
                 ? ConfigScreen.format(config.cutoffDistanceBlocks)
                 : ConfigScreen.format(override.distanceBlocks));
+        distanceField.setHint(Component.translatable("emf_distance_cutoff.distance_placeholder"));
         distanceField.setEditable(!useGlobal);
         addRenderableWidget(distanceField);
 
@@ -58,18 +61,18 @@ public final class EntityConfigScreen extends Screen {
             useGlobal = true;
             distanceField.setValue(ConfigScreen.format(config.cutoffDistanceBlocks));
             distanceField.setEditable(false);
-        }).bounds(center - 110, top + 116, 220, 20).build());
+        }).bounds(left, top + 123, fieldWidth, 20).build());
 
         addRenderableWidget(Button.builder(Component.translatable("emf_distance_cutoff.reset"), button -> {
             config.resetOverride(entityId.toString());
             CutoffConfig.save();
             onClose();
-        }).bounds(center - 110, top + 144, 220, 20).build());
+        }).bounds(left, top + 152, fieldWidth, 20).build());
 
         addRenderableWidget(Button.builder(Component.translatable("emf_distance_cutoff.save"), button -> save())
-                .bounds(center - 110, top + 172, 105, 20).build());
+                .bounds(left, top + 181, fieldWidth / 2 - 4, 20).build());
         addRenderableWidget(Button.builder(Component.translatable("emf_distance_cutoff.cancel"), button -> onClose())
-                .bounds(center + 5, top + 172, 105, 20).build());
+                .bounds(center + 4, top + 181, fieldWidth / 2 - 4, 20).build());
     }
 
     private Component enabledText() {
@@ -117,13 +120,16 @@ public final class EntityConfigScreen extends Screen {
 
     @Override
     public void extractRenderState(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float delta) {
-        super.extractRenderState(graphics, mouseX, mouseY, delta);
         int center = this.width / 2;
-        graphics.centeredText(this.font, this.title, center, 25, 0xFFFFFFFF);
-        graphics.centeredText(this.font, Component.literal(entityId.toString()), center, 44, 0xFFAAAAAA);
+        int fieldWidth = Math.min(320, this.width - 80);
+        int top = Math.max(54, this.height / 2 - 100);
+
+        graphics.centeredText(this.font, this.title, center, 24, 0xFFFFFFFF);
+        graphics.centeredText(this.font, Component.literal(entityId.toString()), center, 43, 0xFFAAAAAA);
         graphics.centeredText(this.font,
-                Component.translatable("emf_distance_cutoff.enabled_label"), center, 67, 0xFFFFFFFF);
+                Component.translatable("emf_distance_cutoff.enabled_label"), center, top + 18, 0xFFFFFFFF);
         graphics.centeredText(this.font,
-                Component.translatable("emf_distance_cutoff.custom_distance_label"), center, 126, 0xFFFFFFFF);
+                Component.translatable("emf_distance_cutoff.custom_distance_label"), center, top + 78, 0xFFFFFFFF);
+        super.extractRenderState(graphics, mouseX, mouseY, delta);
     }
 }
