@@ -27,26 +27,30 @@ public final class ConfigScreen extends Screen {
         super.init();
 
         int center = this.width / 2;
+        int fieldWidth = Math.min(320, this.width - 80);
         int top = 34;
 
-        globalDistanceField = new EditBox(this.font, center - 100, top + 35, 200, 20,
+        globalDistanceField = new EditBox(this.font, center - fieldWidth / 2, top + 34, fieldWidth, 20,
                 Component.translatable("emf_distance_cutoff.global_distance"));
         globalDistanceField.setMaxLength(12);
         globalDistanceField.setValue(format(config.cutoffDistanceBlocks));
+        globalDistanceField.setHint(Component.translatable("emf_distance_cutoff.distance_placeholder"));
         addRenderableWidget(globalDistanceField);
 
-        searchField = new EditBox(this.font, center - 150, top + 90, 300, 20,
+        searchField = new EditBox(this.font, center - fieldWidth / 2, top + 88, fieldWidth, 20,
                 Component.translatable("emf_distance_cutoff.search"));
         searchField.setMaxLength(64);
+        searchField.setHint(Component.translatable("emf_distance_cutoff.search_placeholder"));
         searchField.setResponder(value -> {
             if (entityList != null) entityList.rebuild(value);
         });
         addRenderableWidget(searchField);
 
         int listTop = top + 124;
-        int listBottom = this.height - 46;
-        entityList = new EntityListWidget(Minecraft.getInstance(), this.width,
-                Math.max(60, listBottom - listTop), listTop, 24, this);
+        int listBottom = this.height - 48;
+        int listWidth = Math.min(820, this.width - 80);
+        entityList = new EntityListWidget(Minecraft.getInstance(), listWidth,
+                Math.max(80, listBottom - listTop), listTop, 34, this);
         entityList.rebuild(searchField.getValue());
         addRenderableWidget(entityList);
 
@@ -86,12 +90,11 @@ public final class ConfigScreen extends Screen {
 
     @Override
     public void extractRenderState(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float delta) {
+        graphics.centeredText(this.font, this.title, this.width / 2, 14, 0xFFFFFFFF);
+        graphics.centeredText(this.font,
+                Component.translatable("emf_distance_cutoff.global_distance_label"), this.width / 2, 60, 0xFFFFFFFF);
+        graphics.centeredText(this.font,
+                Component.translatable("emf_distance_cutoff.entities"), this.width / 2, 121, 0xFFFFFFFF);
         super.extractRenderState(graphics, mouseX, mouseY, delta);
-        int center = this.width / 2;
-        graphics.centeredText(this.font, this.title, center, 14, 0xFFFFFFFF);
-        graphics.centeredText(this.font,
-                Component.translatable("emf_distance_cutoff.global_distance_label"), center, 62, 0xFFFFFFFF);
-        graphics.centeredText(this.font,
-                Component.translatable("emf_distance_cutoff.entities"), center, 119, 0xFFFFFFFF);
     }
 }
