@@ -1,0 +1,22 @@
+{
+  "emf_distance_cutoff.title": "EMF Distance Cutoff",
+  "emf_distance_cutoff.global_distance": "Global distance",
+  "emf_distance_cutoff.global_distance_label": "Global distance (blocks)",
+  "emf_distance_cutoff.entities": "Mob / Entity Settings",
+  "emf_distance_cutoff.search": "Search",
+  "emf_distance_cutoff.search_placeholder": "Search by mob name or ID…",
+  "emf_distance_cutoff.distance_placeholder": "Enter distance (e.g. 24)",
+  "emf_distance_cutoff.custom_distance": "Custom distance",
+  "emf_distance_cutoff.custom_distance_label": "Custom distance (blocks)",
+  "emf_distance_cutoff.save": "Save",
+  "emf_distance_cutoff.cancel": "Cancel",
+  "emf_distance_cutoff.enabled_label": "Enabled",
+  "emf_distance_cutoff.use_global_with_value": "Use global distance (%s)",
+  "emf_distance_cutoff.reset": "Reset individual setting",
+  "emf_distance_cutoff.on": "ON",
+  "emf_distance_cutoff.off": "OFF",
+  "emf_distance_cutoff.status_inherited": "Inherited: %s blocks",
+  "emf_distance_cutoff.status_disabled": "Disabled",
+  "emf_distance_cutoff.status_global": "Global: %s blocks",
+  "emf_distance_cutoff.status_custom": "%s blocks"
+}
