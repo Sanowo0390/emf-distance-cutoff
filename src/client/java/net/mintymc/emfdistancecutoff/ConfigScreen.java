@@ -33,7 +33,6 @@ public final class ConfigScreen extends Screen {
                 Component.translatable("emf_distance_cutoff.global_distance"));
         globalDistanceField.setMaxLength(12);
         globalDistanceField.setValue(format(config.cutoffDistanceBlocks));
-        globalDistanceField.setFilter(value -> value.matches("[0-9]*([.][0-9]*)?"));
         addRenderableWidget(globalDistanceField);
 
         searchField = new EditBox(this.font, center - 150, top + 90, 300, 20,
