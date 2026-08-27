@@ -29,7 +29,7 @@ public final class EntityListWidget extends ObjectSelectionList<EntityListWidget
         List<Identifier> ids = new ArrayList<>();
 
         for (Identifier id : BuiltInRegistries.ENTITY_TYPE.keySet()) {
-            EntityType<?> type = BuiltInRegistries.ENTITY_TYPE.get(id);
+            EntityType<?> type = BuiltInRegistries.ENTITY_TYPE.get(id).map(reference -> reference.value()).orElse(null);
             String translatedName = type != null ? type.getDescription().getString() : "";
             String searchable = id + " " + translatedName;
             if (normalized.isEmpty() || searchable.toLowerCase(Locale.ROOT).contains(normalized)) {
@@ -38,7 +38,7 @@ public final class EntityListWidget extends ObjectSelectionList<EntityListWidget
         }
 
         ids.sort(Comparator.comparing(id -> {
-            EntityType<?> type = BuiltInRegistries.ENTITY_TYPE.get(id);
+            EntityType<?> type = BuiltInRegistries.ENTITY_TYPE.get(id).map(reference -> reference.value()).orElse(null);
             return (type != null ? type.getDescription().getString() : id.toString()).toLowerCase(Locale.ROOT);
         }));
 
@@ -57,7 +57,7 @@ public final class EntityListWidget extends ObjectSelectionList<EntityListWidget
         }
 
         private Component getLabel() {
-            EntityType<?> type = BuiltInRegistries.ENTITY_TYPE.get(id);
+            EntityType<?> type = BuiltInRegistries.ENTITY_TYPE.get(id).map(reference -> reference.value()).orElse(null);
             String name = type != null ? type.getDescription().getString() : id.toString();
             return Component.literal(name).append(Component.literal("  ")).append(statusText());
         }
