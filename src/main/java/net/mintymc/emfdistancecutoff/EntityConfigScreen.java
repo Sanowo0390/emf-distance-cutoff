@@ -56,11 +56,8 @@ public final class EntityConfigScreen extends Screen {
         distanceField.active = !useGlobal;
         addDrawableChild(distanceField);
 
-        addDrawableChild(ButtonWidget.builder(distanceButtonText(), button -> {
+        addDrawableChild(ButtonWidget.builder(Text.translatable("emf_distance_cutoff.use_custom_with_value", ConfigScreen.format(config.cutoffDistanceBlocks)), button -> {
             useGlobal = false;
-            if (distanceField.getText().isBlank() || useGlobalWasDefault()) {
-                distanceField.setText(ConfigScreen.format(config.cutoffDistanceBlocks));
-            }
             distanceField.active = true;
             distanceField.setFocused(true);
         }).dimensions(left, top + 141, contentWidth, 20).build());
@@ -82,16 +79,10 @@ public final class EntityConfigScreen extends Screen {
         addDrawableChild(ButtonWidget.builder(Text.translatable("emf_distance_cutoff.cancel"), button -> close()).dimensions(left + half + 8, top + 228, half, 20).build());
     }
 
-    private boolean useGlobalWasDefault() {
-        return useGlobal;
-    }
-
-    private ComponentLike distanceButtonText() {
-        return null;
-    }
-
     private Text enabledText() {
-        return Text.translatable("emf_distance_cutoff.enabled_label").append(Text.literal(": ")).append(Text.translatable(enabled ? "emf_distance_cutoff.on" : "emf_distance_cutoff.off"));
+        return Text.translatable("emf_distance_cutoff.enabled_label")
+                .append(Text.literal(": "))
+                .append(Text.translatable(enabled ? "emf_distance_cutoff.on" : "emf_distance_cutoff.off"));
     }
 
     private void save() {
@@ -126,6 +117,4 @@ public final class EntityConfigScreen extends Screen {
         context.drawCenteredTextWithShadow(this.textRenderer, Text.translatable("emf_distance_cutoff.custom_distance_label"), center, top + 100, 0xFFFFFF);
         super.render(context, mouseX, mouseY, delta);
     }
-
-    private interface ComponentLike {}
 }
