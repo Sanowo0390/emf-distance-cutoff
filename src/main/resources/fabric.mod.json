@@ -4,7 +4,12 @@
   "version": "${version}",
   "name": "EMF Distance Cutoff",
   "description": "Forces EMF custom entity models back to vanilla beyond a configurable distance, with per-entity controls.",
-  "authors": ["MintyMC"],
+  "authors": ["5anowo"],
+  "contact": {
+    "homepage": "https://github.com/Sanowo0390/emf-distance-cutoff",
+    "issues": "https://github.com/Sanowo0390/emf-distance-cutoff/issues",
+    "sources": "https://github.com/Sanowo0390/emf-distance-cutoff"
+  },
   "license": "CC0-1.0",
   "environment": "client",
   "entrypoints": {
