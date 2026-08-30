@@ -17,7 +17,7 @@
   "emf_distance_cutoff.reset_all": "すべての設定をリセット",
   "emf_distance_cutoff.on": "ON",
   "emf_distance_cutoff.off": "OFF",
-  "emf_distance_cutoff.status_inherited": "継承: %s ブロック",
+  "emf_distance_cutoff.status_inherited": "全体: %s ブロック",
   "emf_distance_cutoff.status_disabled": "無効",
   "emf_distance_cutoff.status_global": "全体: %s ブロック",
   "emf_distance_cutoff.status_custom": "%s ブロック"
