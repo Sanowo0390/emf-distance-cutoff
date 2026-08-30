@@ -16,8 +16,9 @@ import java.util.Map;
 public final class CutoffConfig {
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
     private static final Path CONFIG_PATH = FabricLoader.getInstance().getConfigDir().resolve("emf_distance_cutoff.json");
+    public static final double DEFAULT_DISTANCE_BLOCKS = 24.0;
 
-    public double cutoffDistanceBlocks = 24.0;
+    public double cutoffDistanceBlocks = DEFAULT_DISTANCE_BLOCKS;
     public Map<String, EntityOverride> entities = new LinkedHashMap<>();
     private static CutoffConfig instance;
 
@@ -64,6 +65,11 @@ public final class CutoffConfig {
 
     public void resetOverride(String entityId) {
         entities.remove(entityId);
+    }
+
+    public void resetAll() {
+        cutoffDistanceBlocks = DEFAULT_DISTANCE_BLOCKS;
+        entities.clear();
     }
 
     public static final class EntityOverride {
