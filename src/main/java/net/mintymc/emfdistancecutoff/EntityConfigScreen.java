@@ -35,7 +35,7 @@ public final class EntityConfigScreen extends Screen {
 
         CutoffConfig.EntityOverride override = config.getOverride(entityId.toString());
         enabled = override == null || override.enabled;
-        useGlobal = override == null || override.distanceBlocks == null;
+        useGlobal = override != null && override.distanceBlocks == null;
 
         int center = this.width / 2;
         int contentWidth = Math.min(320, Math.max(200, this.width - 80));
@@ -52,31 +52,33 @@ public final class EntityConfigScreen extends Screen {
         distanceField.setMaxLength(12);
         distanceField.setTextPredicate(value -> value.matches("[0-9]*([.][0-9]*)?"));
         distanceField.setPlaceholder(Text.translatable("emf_distance_cutoff.distance_placeholder"));
-        distanceField.setText(useGlobal ? ConfigScreen.format(config.cutoffDistanceBlocks) : ConfigScreen.format(override.distanceBlocks));
+        distanceField.setText(override != null && override.distanceBlocks != null
+                ? ConfigScreen.format(override.distanceBlocks)
+                : ConfigScreen.format(config.cutoffDistanceBlocks));
         distanceField.active = !useGlobal;
         addDrawableChild(distanceField);
 
-        addDrawableChild(ButtonWidget.builder(Text.translatable("emf_distance_cutoff.use_custom_with_value", ConfigScreen.format(config.cutoffDistanceBlocks)), button -> {
-            useGlobal = false;
-            distanceField.active = true;
-            distanceField.setFocused(true);
+        addDrawableChild(ButtonWidget.builder(modeButtonText(), button -> {
+            useGlobal = !useGlobal;
+            if (useGlobal) {
+                distanceField.setText(ConfigScreen.format(config.cutoffDistanceBlocks));
+            }
+            distanceField.active = !useGlobal;
+            distanceField.setFocused(!useGlobal);
+            button.setMessage(modeButtonText());
         }).dimensions(left, top + 141, contentWidth, 20).build());
-
-        addDrawableChild(ButtonWidget.builder(Text.translatable("emf_distance_cutoff.use_global_with_value", ConfigScreen.format(config.cutoffDistanceBlocks)), button -> {
-            useGlobal = true;
-            distanceField.setText(ConfigScreen.format(config.cutoffDistanceBlocks));
-            distanceField.active = false;
-        }).dimensions(left, top + 170, contentWidth, 20).build());
 
         addDrawableChild(ButtonWidget.builder(Text.translatable("emf_distance_cutoff.reset"), button -> {
             config.resetOverride(entityId.toString());
             CutoffConfig.save();
             if (this.client != null) this.client.setScreen(parent);
-        }).dimensions(left, top + 199, contentWidth, 20).build());
+        }).dimensions(left, top + 170, contentWidth, 20).build());
 
         int half = (contentWidth - 8) / 2;
-        addDrawableChild(ButtonWidget.builder(Text.translatable("emf_distance_cutoff.save"), button -> save()).dimensions(left, top + 228, half, 20).build());
-        addDrawableChild(ButtonWidget.builder(Text.translatable("emf_distance_cutoff.cancel"), button -> close()).dimensions(left + half + 8, top + 228, half, 20).build());
+        addDrawableChild(ButtonWidget.builder(Text.translatable("emf_distance_cutoff.save"), button -> save())
+                .dimensions(left, top + 199, half, 20).build());
+        addDrawableChild(ButtonWidget.builder(Text.translatable("emf_distance_cutoff.cancel"), button -> close())
+                .dimensions(left + half + 8, top + 199, half, 20).build());
     }
 
     private Text enabledText() {
@@ -85,11 +87,28 @@ public final class EntityConfigScreen extends Screen {
                 .append(Text.translatable(enabled ? "emf_distance_cutoff.on" : "emf_distance_cutoff.off"));
     }
 
+    private Text modeButtonText() {
+        return Text.translatable(useGlobal
+                ? "emf_distance_cutoff.use_custom_with_value"
+                : "emf_distance_cutoff.use_global_with_value",
+                ConfigScreen.format(useGlobal ? config.cutoffDistanceBlocks : parseFieldOrGlobal()));
+    }
+
+    private double parseFieldOrGlobal() {
+        try {
+            double value = Double.parseDouble(distanceField.getText());
+            return Double.isFinite(value) ? value : config.cutoffDistanceBlocks;
+        } catch (NumberFormatException e) {
+            return config.cutoffDistanceBlocks;
+        }
+    }
+
     private void save() {
         CutoffConfig.EntityOverride override = config.getOrCreateOverride(entityId.toString());
         override.enabled = enabled;
-        if (useGlobal) override.distanceBlocks = null;
-        else {
+        if (useGlobal) {
+            override.distanceBlocks = null;
+        } else {
             Double parsed = parsePositiveOrZero(distanceField.getText());
             if (parsed == null) return;
             override.distanceBlocks = parsed;
@@ -99,12 +118,18 @@ public final class EntityConfigScreen extends Screen {
     }
 
     private static Double parsePositiveOrZero(String value) {
-        try { double parsed = Double.parseDouble(value); return Double.isFinite(parsed) && parsed >= 0 ? parsed : null; }
-        catch (NumberFormatException e) { return null; }
+        try {
+            double parsed = Double.parseDouble(value);
+            return Double.isFinite(parsed) && parsed >= 0 ? parsed : null;
+        } catch (NumberFormatException e) {
+            return null;
+        }
     }
 
     @Override
-    public void close() { if (this.client != null) this.client.setScreen(parent); }
+    public void close() {
+        if (this.client != null) this.client.setScreen(parent);
+    }
 
     @Override
     public void render(DrawContext context, int mouseX, int mouseY, float delta) {
