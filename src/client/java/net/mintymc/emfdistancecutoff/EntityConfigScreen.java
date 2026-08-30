@@ -11,12 +11,14 @@ import net.minecraft.world.entity.EntityType;
 
 public final class EntityConfigScreen extends Screen {
     private static final int CONTENT_WIDTH = 320;
-    private static final int CONTENT_HEIGHT = 268;
+    private static final int CONTENT_HEIGHT = 292;
 
     private final Screen parent;
     private final Identifier entityId;
     private final CutoffConfig config;
     private EditBox distanceField;
+    private Button enabledButton;
+    private Button distanceModeButton;
     private boolean enabled;
     private boolean useGlobal;
 
@@ -42,7 +44,7 @@ public final class EntityConfigScreen extends Screen {
     }
 
     private int contentTop() {
-        return Math.max(12, (this.height - CONTENT_HEIGHT) / 2);
+        return Math.max(10, (this.height - CONTENT_HEIGHT) / 2);
     }
 
     @Override
@@ -57,7 +59,7 @@ public final class EntityConfigScreen extends Screen {
         int width = contentWidth();
         int top = contentTop();
 
-        addRenderableWidget(Button.builder(enabledText(), button -> {
+        enabledButton = addRenderableWidget(Button.builder(enabledText(), button -> {
             enabled = !enabled;
             button.setMessage(enabledText());
         }).bounds(left, top + 66, width, 20).build());
@@ -72,10 +74,13 @@ public final class EntityConfigScreen extends Screen {
         distanceField.setEditable(!useGlobal);
         addRenderableWidget(distanceField);
 
-        addRenderableWidget(Button.builder(globalButtonText(), button -> {
-            useGlobal = true;
-            distanceField.setValue(ConfigScreen.format(config.cutoffDistanceBlocks));
-            distanceField.setEditable(false);
+        distanceModeButton = addRenderableWidget(Button.builder(distanceModeText(), button -> {
+            useGlobal = !useGlobal;
+            if (useGlobal) {
+                distanceField.setValue(ConfigScreen.format(config.cutoffDistanceBlocks));
+            }
+            distanceField.setEditable(!useGlobal);
+            button.setMessage(distanceModeText());
         }).bounds(left, top + 155, width, 20).build());
 
         addRenderableWidget(Button.builder(Component.translatable("emf_distance_cutoff.reset"), button -> {
@@ -86,9 +91,9 @@ public final class EntityConfigScreen extends Screen {
 
         int half = (width - 8) / 2;
         addRenderableWidget(Button.builder(Component.translatable("emf_distance_cutoff.save"), button -> save())
-                .bounds(left, top + 213, half, 20).build());
+                .bounds(left, top + 223, half, 20).build());
         addRenderableWidget(Button.builder(Component.translatable("emf_distance_cutoff.cancel"), button -> onClose())
-                .bounds(left + half + 8, top + 213, half, 20).build());
+                .bounds(left + half + 8, top + 223, half, 20).build());
     }
 
     private Component enabledText() {
@@ -99,9 +104,19 @@ public final class EntityConfigScreen extends Screen {
                         : "emf_distance_cutoff.off"));
     }
 
-    private Component globalButtonText() {
-        return Component.translatable("emf_distance_cutoff.use_global_with_value",
-                ConfigScreen.format(config.cutoffDistanceBlocks));
+    private Component distanceModeText() {
+        return Component.translatable(useGlobal
+                ? "emf_distance_cutoff.use_global_with_value"
+                : "emf_distance_cutoff.use_custom_with_value",
+                ConfigScreen.format(useGlobal ? config.cutoffDistanceBlocks : currentFieldValue()));
+    }
+
+    private double currentFieldValue() {
+        try {
+            return Double.parseDouble(distanceField.getValue());
+        } catch (NumberFormatException e) {
+            return config.cutoffDistanceBlocks;
+        }
     }
 
     private void save() {
