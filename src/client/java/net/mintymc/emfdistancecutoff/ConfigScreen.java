@@ -52,18 +52,28 @@ public final class ConfigScreen extends Screen {
         addRenderableWidget(searchField);
 
         int listTop = SEARCH_Y + 28;
-        int listBottom = this.height - 38;
+        int listBottom = this.height - 66;
         int listWidth = Math.min(760, Math.max(220, this.width - 80));
         entityList = new EntityListWidget(Minecraft.getInstance(), listWidth,
                 Math.max(80, listBottom - listTop), listTop, 34, this);
         entityList.rebuild(searchField.getValue());
         addRenderableWidget(entityList);
 
-        int buttonY = this.height - 30;
+        int bottomY = this.height - 30;
+        int resetWidth = Math.min(170, Math.max(120, this.width - 40));
+        addRenderableWidget(Button.builder(Component.translatable("emf_distance_cutoff.reset_all"), button -> resetAll())
+                .bounds(center - resetWidth / 2, this.height - 56, resetWidth, 20).build());
         addRenderableWidget(Button.builder(Component.translatable("emf_distance_cutoff.save"), button -> saveAndClose())
-                .bounds(center - 100, buttonY, 95, 20).build());
+                .bounds(center - 100, bottomY, 95, 20).build());
         addRenderableWidget(Button.builder(Component.translatable("emf_distance_cutoff.cancel"), button -> onClose())
-                .bounds(center + 5, buttonY, 95, 20).build());
+                .bounds(center + 5, bottomY, 95, 20).build());
+    }
+
+    private void resetAll() {
+        config.resetAll();
+        globalDistanceField.setValue(format(CutoffConfig.DEFAULT_DISTANCE_BLOCKS));
+        if (entityList != null) entityList.rebuild(searchField.getValue());
+        CutoffConfig.save();
     }
 
     private void saveAndClose() {
