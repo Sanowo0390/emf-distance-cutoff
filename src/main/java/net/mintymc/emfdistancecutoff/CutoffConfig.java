@@ -3,6 +3,7 @@ package net.mintymc.emfdistancecutoff;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import net.fabricmc.loader.api.FabricLoader;
+
 import java.io.IOException;
 import java.io.Reader;
 import java.io.Writer;
@@ -13,9 +14,10 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 public final class CutoffConfig {
+    public static final double DEFAULT_DISTANCE_BLOCKS = 24.0;
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
     private static final Path CONFIG_PATH = FabricLoader.getInstance().getConfigDir().resolve("emf_distance_cutoff.json");
-    public double cutoffDistanceBlocks = 24.0;
+    public double cutoffDistanceBlocks = DEFAULT_DISTANCE_BLOCKS;
     public Map<String, EntityOverride> entities = new LinkedHashMap<>();
     private static CutoffConfig instance;
 
@@ -42,6 +44,10 @@ public final class CutoffConfig {
     public EntityOverride getOverride(String entityId) { return entities.get(entityId); }
     public EntityOverride getOrCreateOverride(String entityId) { return entities.computeIfAbsent(entityId, id -> new EntityOverride()); }
     public void resetOverride(String entityId) { entities.remove(entityId); }
+    public void resetAll() {
+        cutoffDistanceBlocks = DEFAULT_DISTANCE_BLOCKS;
+        entities.clear();
+    }
     public static final class EntityOverride {
         public boolean enabled = true;
         public Double distanceBlocks = null;
