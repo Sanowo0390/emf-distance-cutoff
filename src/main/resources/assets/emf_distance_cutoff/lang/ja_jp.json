@@ -14,6 +14,8 @@
   "emf_distance_cutoff.save": "保存",
   "emf_distance_cutoff.cancel": "キャンセル",
   "emf_distance_cutoff.enabled_label": "有効",
+  "emf_distance_cutoff.individual_model_toggle": "個別モデル距離: %s",
+  "emf_distance_cutoff.individual_pause_toggle": "個別停止距離: %s",
   "emf_distance_cutoff.use_custom_with_value": "個別の距離を使用（%s）",
   "emf_distance_cutoff.use_global_with_value": "全体の距離を使用（%s）",
   "emf_distance_cutoff.use_custom_animation_pause_with_value": "個別の停止距離を使用（%s）",

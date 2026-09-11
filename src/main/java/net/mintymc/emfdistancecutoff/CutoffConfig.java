@@ -52,7 +52,22 @@ public final class CutoffConfig {
     public EntityOverride getOverrideForEmfType(String entityId) {
         if (entityId == null || entityId.isBlank()) return null;
         EntityOverride direct = entities.get(entityId);
-        if (direct != null || entityId.indexOf(':') >= 0) return direct;
+        if (direct != null) return direct;
+
+        // EMF's 3.2.x EMFEntity#getTypeString is EntityType#toString.
+        // EntityType#toString returns its translation key (for example
+        // entity.minecraft.creeper), while the GUI stores minecraft:creeper.
+        if (entityId.startsWith("entity.")) {
+            int namespaceEnd = entityId.indexOf('.', "entity.".length());
+            if (namespaceEnd > "entity.".length()) {
+                String registryId = entityId.substring("entity.".length(), namespaceEnd)
+                        + ":" + entityId.substring(namespaceEnd + 1);
+                EntityOverride translated = entities.get(registryId);
+                if (translated != null) return translated;
+            }
+        }
+
+        if (entityId.indexOf(':') >= 0) return null;
         return entities.get("minecraft:" + entityId);
     }
     public EntityOverride getOrCreateOverride(String entityId) { return entities.computeIfAbsent(entityId, id -> new EntityOverride()); }

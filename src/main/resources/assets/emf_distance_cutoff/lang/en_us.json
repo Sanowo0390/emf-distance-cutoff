@@ -14,6 +14,8 @@
   "emf_distance_cutoff.save": "Save",
   "emf_distance_cutoff.cancel": "Cancel",
   "emf_distance_cutoff.enabled_label": "Enabled",
+  "emf_distance_cutoff.individual_model_toggle": "Individual model distance: %s",
+  "emf_distance_cutoff.individual_pause_toggle": "Individual freeze distance: %s",
   "emf_distance_cutoff.use_custom_with_value": "Use custom distance (%s)",
   "emf_distance_cutoff.use_global_with_value": "Use global distance (%s)",
   "emf_distance_cutoff.use_custom_animation_pause_with_value": "Use custom pause distance (%s)",
