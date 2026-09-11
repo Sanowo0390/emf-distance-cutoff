@@ -33,7 +33,7 @@ public final class EMFDistanceCutoffMod implements ClientModInitializer {
     /**
      * Whether this entity should reuse its last complete EMF pose.
      *
-     * <p>EMF 3.0.x's pause API skips its model animation run entirely.  The
+     * <p>EMF 3.2.x's pause API skips its model animation run entirely.  The
      * vanilla setup still resets parts, so that can leave a model with mixed
      * poses.  The mixin restores a complete cached pose instead.</p>
      */

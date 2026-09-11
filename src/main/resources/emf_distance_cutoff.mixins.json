@@ -3,7 +3,7 @@
   "package": "net.mintymc.emfdistancecutoff.mixin",
   "compatibilityLevel": "JAVA_21",
   "client": [
-    "EMFModelPartWithStateMixin"
+    "EMFModelPartRootMixin"
   ],
   "injectors": {
     "defaultRequire": 1

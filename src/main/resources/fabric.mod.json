@@ -22,7 +22,7 @@
   "depends": {
     "fabricloader": ">=0.18.0",
     "minecraft": "1.21.11",
-    "entity_model_features": "*"
+    "entity_model_features": ">=3.2.4"
   },
   "suggests": { "modmenu": ">=17.0.0" }
 }
