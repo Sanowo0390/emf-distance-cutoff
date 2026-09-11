@@ -57,8 +57,8 @@ public final class ConfigScreen extends Screen {
         searchField.setChangedListener(value -> { if (entityList != null) entityList.rebuild(value); });
         addDrawableChild(searchField);
 
-        int listTop = ENTITY_LABEL_Y + 16;
-        int listBottom = this.height - 58;
+        int listTop = ENTITY_LABEL_Y + 14;
+        int listBottom = this.height - 48;
         int listWidth = Math.min(1000, Math.max(300, this.width - 80));
         entityList = new EntityListWidget(this.client, listWidth, Math.max(80, listBottom - listTop), listTop, 28, this);
         entityList.rebuild(searchField.getText());
@@ -124,10 +124,12 @@ public final class ConfigScreen extends Screen {
     public void render(DrawContext context, int mouseX, int mouseY, float delta) {
         renderBackground(context, mouseX, mouseY, delta);
         int center = this.width / 2;
+        super.render(context, mouseX, mouseY, delta);
+        // Screen#render draws the background after child widgets on this game
+        // version, so labels must be drawn last to remain visible.
         context.drawCenteredTextWithShadow(this.textRenderer, this.title, center, TITLE_Y, 0xFFFFFF);
         context.drawCenteredTextWithShadow(this.textRenderer, Text.translatable("emf_distance_cutoff.global_distance_label"), center, GLOBAL_LABEL_Y, 0xFFFFFF);
         context.drawCenteredTextWithShadow(this.textRenderer, Text.translatable("emf_distance_cutoff.animation_pause_distance_label"), center, ANIMATION_LABEL_Y, 0xFFFFFF);
         context.drawCenteredTextWithShadow(this.textRenderer, Text.translatable("emf_distance_cutoff.entities"), center, ENTITY_LABEL_Y, 0xFFFFFF);
-        super.render(context, mouseX, mouseY, delta);
     }
 }

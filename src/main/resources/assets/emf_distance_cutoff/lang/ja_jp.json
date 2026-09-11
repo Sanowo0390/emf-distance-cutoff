@@ -1,9 +1,9 @@
 {
   "emf_distance_cutoff.title": "EMF Distance Cutoff",
   "emf_distance_cutoff.global_distance": "全体の距離",
-  "emf_distance_cutoff.global_distance_label": "全体の距離（ブロック）",
+  "emf_distance_cutoff.global_distance_label": "EMFモデルを表示する距離（ブロック）",
   "emf_distance_cutoff.animation_pause_distance": "アニメーション停止距離",
-  "emf_distance_cutoff.animation_pause_distance_label": "アニメーション停止距離（ブロック）",
+  "emf_distance_cutoff.animation_pause_distance_label": "アニメーションを止める距離（ブロック）",
   "emf_distance_cutoff.animation_pause_placeholder": "停止距離を入力（例: 12、0で無効）",
   "emf_distance_cutoff.entities": "Mob / Entity 設定",
   "emf_distance_cutoff.search": "検索",
@@ -22,8 +22,10 @@
   "emf_distance_cutoff.reset_all": "すべての設定をリセット",
   "emf_distance_cutoff.on": "ON",
   "emf_distance_cutoff.off": "OFF",
-  "emf_distance_cutoff.status_inherited": "全体: %s ブロック",
   "emf_distance_cutoff.status_disabled": "無効",
-  "emf_distance_cutoff.status_global": "全体: %s ブロック",
-  "emf_distance_cutoff.status_custom": "%s ブロック"
+  "emf_distance_cutoff.status_summary": "%s / %s",
+  "emf_distance_cutoff.status_model": "モデル: %s",
+  "emf_distance_cutoff.status_pause": "停止: %s",
+  "emf_distance_cutoff.status_value_global": "全体 %s",
+  "emf_distance_cutoff.status_value_custom": "個別 %s"
 }

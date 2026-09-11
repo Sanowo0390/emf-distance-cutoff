@@ -46,6 +46,13 @@ public final class EntityListWidget extends ElementListWidget<EntityListWidget.E
         setScrollY(0);
     }
 
+    @Override
+    public int getRowWidth() {
+        // EntryListWidget defaults to a narrow 220-pixel row even when the
+        // scroll area is wider. Use the available width for readable labels.
+        return Math.max(100, getWidth() - 12);
+    }
+
     /** Entry type must be accessible because it is exposed by ElementListWidget's generic type. */
     public final class EntityEntry extends ElementListWidget.Entry<EntityEntry> {
         private final Identifier id;
@@ -68,16 +75,22 @@ public final class EntityListWidget extends ElementListWidget<EntityListWidget.E
         }
 
         private Text statusText(CutoffConfig.EntityOverride override) {
-            if (override == null) {
-                return Text.translatable("emf_distance_cutoff.status_inherited", ConfigScreen.format(config.cutoffDistanceBlocks));
-            }
-            if (!override.enabled) {
+            if (override != null && !override.enabled) {
                 return Text.translatable("emf_distance_cutoff.status_disabled");
             }
-            if (override.distanceBlocks == null) {
-                return Text.translatable("emf_distance_cutoff.status_global", ConfigScreen.format(config.cutoffDistanceBlocks));
-            }
-            return Text.translatable("emf_distance_cutoff.status_custom", ConfigScreen.format(override.distanceBlocks));
+            Double customDistance = override == null ? null : override.distanceBlocks;
+            Double customPauseDistance = override == null ? null : override.animationPauseDistanceBlocks;
+            return Text.translatable("emf_distance_cutoff.status_summary",
+                    distanceStatus("emf_distance_cutoff.status_model", customDistance, config.cutoffDistanceBlocks),
+                    distanceStatus("emf_distance_cutoff.status_pause", customPauseDistance, config.animationPauseDistanceBlocks));
+        }
+
+        private Text distanceStatus(String labelKey, Double customValue, double globalValue) {
+            return Text.translatable(labelKey,
+                    Text.translatable(customValue == null
+                                    ? "emf_distance_cutoff.status_value_global"
+                                    : "emf_distance_cutoff.status_value_custom",
+                            ConfigScreen.format(customValue == null ? globalValue : customValue)));
         }
 
         @Override
