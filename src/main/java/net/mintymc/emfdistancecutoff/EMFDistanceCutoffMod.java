@@ -54,10 +54,17 @@ public final class EMFDistanceCutoffMod implements ClientModInitializer {
         double pauseDistance = override != null && override.animationPauseDistanceBlocks != null
                 ? override.animationPauseDistanceBlocks : config.animationPauseDistanceBlocks;
 
-        if (pauseDistance <= 0.0 || modelDistance <= 0.0) return false;
-        if (pauseDistance >= modelDistance) return false;
-
         double distanceSquared = distanceSquared(entity, client);
+        if (pauseDistance <= 0.0) return false;
+
+        // A model cutoff of zero means "never replace this EMF model with the
+        // vanilla one".  It must not also disable the independent animation
+        // freeze setting: in that mode the frozen tier continues indefinitely.
+        if (modelDistance == 0.0) {
+            return distanceSquared >= pauseDistance * pauseDistance;
+        }
+
+        if (modelDistance < 0.0 || pauseDistance >= modelDistance) return false;
         return distanceSquared >= pauseDistance * pauseDistance
                 && distanceSquared <= modelDistance * modelDistance;
     }

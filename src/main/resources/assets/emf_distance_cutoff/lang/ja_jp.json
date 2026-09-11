@@ -8,7 +8,7 @@
   "emf_distance_cutoff.entities": "Mob / Entity 設定",
   "emf_distance_cutoff.search": "検索",
   "emf_distance_cutoff.search_placeholder": "Mob名・IDで検索…",
-  "emf_distance_cutoff.distance_placeholder": "距離を入力（例: 24）",
+  "emf_distance_cutoff.distance_placeholder": "距離を入力（0でバニラへ切替なし）",
   "emf_distance_cutoff.custom_distance": "個別の距離",
   "emf_distance_cutoff.custom_distance_label": "個別の距離（ブロック）",
   "emf_distance_cutoff.save": "保存",

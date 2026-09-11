@@ -8,7 +8,7 @@
   "emf_distance_cutoff.entities": "Mob / Entity Settings",
   "emf_distance_cutoff.search": "Search",
   "emf_distance_cutoff.search_placeholder": "Search by mob name or ID…",
-  "emf_distance_cutoff.distance_placeholder": "Enter distance (e.g. 24)",
+  "emf_distance_cutoff.distance_placeholder": "Enter distance (0 keeps EMF model)",
   "emf_distance_cutoff.custom_distance": "Custom distance",
   "emf_distance_cutoff.custom_distance_label": "Custom distance (blocks)",
   "emf_distance_cutoff.save": "Save",
