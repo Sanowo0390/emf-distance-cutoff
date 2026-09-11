@@ -26,7 +26,7 @@ public final class EMFDistanceCutoffMod implements ClientModInitializer {
 
         String entityId = EntityIdResolver.resolve(entity);
         CutoffConfig config = CutoffConfig.get();
-        CutoffConfig.EntityOverride override = entityId == null ? null : config.getOverride(entityId);
+        CutoffConfig.EntityOverride override = config.getOverrideForEmfType(entityId);
 
         if (override != null && !override.enabled) return false;
 
@@ -53,7 +53,7 @@ public final class EMFDistanceCutoffMod implements ClientModInitializer {
 
         String entityId = EntityIdResolver.resolve(entity);
         CutoffConfig config = CutoffConfig.get();
-        CutoffConfig.EntityOverride override = entityId == null ? null : config.getOverride(entityId);
+        CutoffConfig.EntityOverride override = config.getOverrideForEmfType(entityId);
 
         if (override != null && !override.enabled) return false;
 

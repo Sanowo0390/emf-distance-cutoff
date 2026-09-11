@@ -54,8 +54,10 @@ public final class EntityConfigScreen extends Screen {
         CutoffConfig.EntityOverride override = config.getOverride(entityId.toString());
         enabled = override == null || override.enabled;
         // Custom mode is intentionally the default when opening the screen so the field is immediately editable.
+        // A new entry opens in directly-editable custom mode, while a saved
+        // entry that explicitly uses the global value restores that state.
         useGlobal = override != null && override.distanceBlocks == null;
-        useGlobalAnimationPause = override == null || override.animationPauseDistanceBlocks == null;
+        useGlobalAnimationPause = override != null && override.animationPauseDistanceBlocks == null;
 
         int left = contentLeft();
         int width = contentWidth();
@@ -192,6 +194,7 @@ public final class EntityConfigScreen extends Screen {
 
     @Override
     public void extractRenderState(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float delta) {
+        super.extractRenderState(graphics, mouseX, mouseY, delta);
         int center = this.width / 2;
         int top = contentTop();
         graphics.centeredText(this.font, this.title, center, top + 6, 0xFFFFFFFF);
@@ -199,6 +202,5 @@ public final class EntityConfigScreen extends Screen {
         graphics.centeredText(this.font, Component.translatable("emf_distance_cutoff.enabled_label"), center, top + 47, 0xFFFFFFFF);
         graphics.centeredText(this.font, Component.translatable("emf_distance_cutoff.custom_distance_label"), center, top + 103, 0xFFFFFFFF);
         graphics.centeredText(this.font, Component.translatable("emf_distance_cutoff.animation_pause_distance_label"), center, top + 189, 0xFFFFFFFF);
-        super.extractRenderState(graphics, mouseX, mouseY, delta);
     }
 }

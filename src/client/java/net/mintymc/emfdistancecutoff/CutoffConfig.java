@@ -61,6 +61,17 @@ public final class CutoffConfig {
         return entities.get(entityId);
     }
 
+    /**
+     * GUI settings use canonical registry ids.  Some EMF compatibility render
+     * paths omit minecraft: from the type string, so accept that spelling too.
+     */
+    public EntityOverride getOverrideForEmfType(String entityId) {
+        if (entityId == null || entityId.isBlank()) return null;
+        EntityOverride direct = entities.get(entityId);
+        if (direct != null || entityId.indexOf(':') >= 0) return direct;
+        return entities.get("minecraft:" + entityId);
+    }
+
     public EntityOverride getOrCreateOverride(String entityId) {
         return entities.computeIfAbsent(entityId, id -> new EntityOverride());
     }

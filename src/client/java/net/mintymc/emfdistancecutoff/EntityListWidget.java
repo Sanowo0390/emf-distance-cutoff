@@ -69,16 +69,22 @@ public final class EntityListWidget extends ObjectSelectionList<EntityListWidget
 
         private Component statusText() {
             CutoffConfig.EntityOverride override = config.getOverride(id.toString());
-            if (override == null) {
-                return Component.translatable("emf_distance_cutoff.status_inherited", ConfigScreen.format(config.cutoffDistanceBlocks));
-            }
-            if (!override.enabled) {
+            if (override != null && !override.enabled) {
                 return Component.translatable("emf_distance_cutoff.status_disabled");
             }
-            if (override.distanceBlocks == null) {
-                return Component.translatable("emf_distance_cutoff.status_global", ConfigScreen.format(config.cutoffDistanceBlocks));
-            }
-            return Component.translatable("emf_distance_cutoff.status_custom", ConfigScreen.format(override.distanceBlocks));
+            Double customDistance = override == null ? null : override.distanceBlocks;
+            Double customPauseDistance = override == null ? null : override.animationPauseDistanceBlocks;
+            return Component.translatable("emf_distance_cutoff.status_summary",
+                    distanceStatus("emf_distance_cutoff.status_model", customDistance, config.cutoffDistanceBlocks),
+                    distanceStatus("emf_distance_cutoff.status_pause", customPauseDistance, config.animationPauseDistanceBlocks));
+        }
+
+        private Component distanceStatus(String labelKey, Double customValue, double globalValue) {
+            return Component.translatable(labelKey,
+                    Component.translatable(customValue == null
+                                    ? "emf_distance_cutoff.status_value_global"
+                                    : "emf_distance_cutoff.status_value_custom",
+                            ConfigScreen.format(customValue == null ? globalValue : customValue)));
         }
 
         @Override
