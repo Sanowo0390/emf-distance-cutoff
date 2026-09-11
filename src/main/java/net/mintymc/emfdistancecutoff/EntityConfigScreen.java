@@ -42,16 +42,26 @@ public final class EntityConfigScreen extends Screen {
         useGlobalAnimationPause = false;
 
         int center = this.width / 2;
-        int contentWidth = Math.min(520, Math.max(300, this.width - 80));
+        boolean compact = this.height < 340;
+        int contentWidth = Math.min(520, Math.max(180, this.width - 24));
         int left = center - contentWidth / 2;
-        int top = Math.max(30, (this.height - 330) / 2);
+        int top = compact ? 6 : Math.max(30, (this.height - 330) / 2);
+        int enabledY = top + (compact ? 40 : 54);
+        int modelLabelY = top + (compact ? 66 : 100);
+        int modelFieldY = top + (compact ? 78 : 112);
+        int modelModeY = top + (compact ? 102 : 141);
+        int pauseLabelY = top + (compact ? 128 : 183);
+        int pauseFieldY = top + (compact ? 140 : 195);
+        int pauseModeY = top + (compact ? 164 : 224);
+        int resetY = top + (compact ? 188 : 253);
+        int actionsY = top + (compact ? 212 : 282);
 
         addDrawableChild(ButtonWidget.builder(enabledText(), button -> {
             enabled = !enabled;
             button.setMessage(enabledText());
-        }).dimensions(left, top + 54, contentWidth, 20).build());
+        }).dimensions(left, enabledY, contentWidth, 20).build());
 
-        distanceField = createNumberField(left, top + 112,
+        distanceField = createNumberField(left, modelFieldY,
                 Text.translatable("emf_distance_cutoff.custom_distance"),
                 override != null && override.distanceBlocks != null
                         ? ConfigScreen.format(override.distanceBlocks)
@@ -66,9 +76,9 @@ public final class EntityConfigScreen extends Screen {
             distanceField.active = !useGlobal;
             distanceField.setFocused(!useGlobal);
             button.setMessage(modeButtonText());
-        }).dimensions(left, top + 141, contentWidth, 20).build());
+        }).dimensions(left, modelModeY, contentWidth, 20).build());
 
-        animationPauseDistanceField = createNumberField(left, top + 195,
+        animationPauseDistanceField = createNumberField(left, pauseFieldY,
                 Text.translatable("emf_distance_cutoff.animation_pause_distance"),
                 override != null && override.animationPauseDistanceBlocks != null
                         ? ConfigScreen.format(override.animationPauseDistanceBlocks)
@@ -85,23 +95,23 @@ public final class EntityConfigScreen extends Screen {
             animationPauseDistanceField.active = !useGlobalAnimationPause;
             animationPauseDistanceField.setFocused(!useGlobalAnimationPause);
             button.setMessage(animationModeButtonText());
-        }).dimensions(left, top + 224, contentWidth, 20).build());
+        }).dimensions(left, pauseModeY, contentWidth, 20).build());
 
         addDrawableChild(ButtonWidget.builder(Text.translatable("emf_distance_cutoff.reset"), button -> {
             config.resetOverride(entityId.toString());
             CutoffConfig.save();
             if (this.client != null) this.client.setScreen(parent);
-        }).dimensions(left, top + 253, contentWidth, 20).build());
+        }).dimensions(left, resetY, contentWidth, 20).build());
 
         int half = (contentWidth - 8) / 2;
         addDrawableChild(ButtonWidget.builder(Text.translatable("emf_distance_cutoff.save"), button -> save())
-                .dimensions(left, top + 282, half, 20).build());
+                .dimensions(left, actionsY, half, 20).build());
         addDrawableChild(ButtonWidget.builder(Text.translatable("emf_distance_cutoff.cancel"), button -> close())
-                .dimensions(left + half + 8, top + 282, half, 20).build());
+                .dimensions(left + half + 8, actionsY, half, 20).build());
     }
 
     private TextFieldWidget createNumberField(int x, int y, Text message, String value, Text placeholder) {
-        TextFieldWidget field = new TextFieldWidget(this.textRenderer, x, y, Math.min(520, Math.max(300, this.width - 80)), 20, message);
+        TextFieldWidget field = new TextFieldWidget(this.textRenderer, x, y, Math.min(520, Math.max(180, this.width - 24)), 20, message);
         field.setMaxLength(12);
         field.setTextPredicate(input -> input.matches("[0-9]*([.][0-9]*)?"));
         field.setPlaceholder(placeholder);
@@ -179,12 +189,16 @@ public final class EntityConfigScreen extends Screen {
     public void render(DrawContext context, int mouseX, int mouseY, float delta) {
         renderBackground(context, mouseX, mouseY, delta);
         int center = this.width / 2;
-        int top = Math.max(30, (this.height - 330) / 2);
+        boolean compact = this.height < 340;
+        int top = compact ? 6 : Math.max(30, (this.height - 330) / 2);
+        int enabledLabelY = top + (compact ? 28 : 42);
+        int modelLabelY = top + (compact ? 66 : 100);
+        int pauseLabelY = top + (compact ? 128 : 183);
+        super.render(context, mouseX, mouseY, delta);
         context.drawCenteredTextWithShadow(this.textRenderer, this.title, center, top + 5, 0xFFFFFF);
         context.drawCenteredTextWithShadow(this.textRenderer, Text.literal(entityId.toString()), center, top + 24, 0xAAAAAA);
-        context.drawCenteredTextWithShadow(this.textRenderer, Text.translatable("emf_distance_cutoff.enabled_label"), center, top + 42, 0xFFFFFF);
-        context.drawCenteredTextWithShadow(this.textRenderer, Text.translatable("emf_distance_cutoff.custom_distance_label"), center, top + 100, 0xFFFFFF);
-        context.drawCenteredTextWithShadow(this.textRenderer, Text.translatable("emf_distance_cutoff.animation_pause_distance_label"), center, top + 183, 0xFFFFFF);
-        super.render(context, mouseX, mouseY, delta);
+        context.drawCenteredTextWithShadow(this.textRenderer, Text.translatable("emf_distance_cutoff.enabled_label"), center, enabledLabelY, 0xFFFFFF);
+        context.drawCenteredTextWithShadow(this.textRenderer, Text.translatable("emf_distance_cutoff.custom_distance_label"), center, modelLabelY, 0xFFFFFF);
+        context.drawCenteredTextWithShadow(this.textRenderer, Text.translatable("emf_distance_cutoff.animation_pause_distance_label"), center, pauseLabelY, 0xFFFFFF);
     }
 }

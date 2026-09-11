@@ -35,7 +35,8 @@ public final class ConfigScreen extends Screen {
         super.init();
 
         int center = this.width / 2;
-        int fieldWidth = Math.min(760, Math.max(300, this.width - 120));
+        int horizontalMargin = Math.min(60, Math.max(12, this.width / 8));
+        int fieldWidth = Math.min(760, Math.max(180, this.width - horizontalMargin * 2));
         int left = center - fieldWidth / 2;
 
         globalDistanceField = createNumberField(left, GLOBAL_FIELD_Y,
@@ -59,15 +60,23 @@ public final class ConfigScreen extends Screen {
 
         int listTop = ENTITY_LABEL_Y + 14;
         int listBottom = this.height - 48;
-        int listWidth = Math.min(1000, Math.max(300, this.width - 80));
+        int listWidth = fieldWidth;
         entityList = new EntityListWidget(this.client, listWidth, Math.max(80, listBottom - listTop), listTop, 28, this);
         entityList.rebuild(searchField.getText());
         addDrawableChild(entityList);
 
         int buttonY = this.height - 40;
+        int buttonMargin = Math.max(8, Math.min(40, this.width / 12));
+        int availableButtonWidth = this.width - buttonMargin * 2;
         int resetWidth = 230;
         int actionWidth = 130;
         int gap = 10;
+        int preferredButtonWidth = resetWidth + actionWidth * 2 + gap * 2;
+        if (availableButtonWidth < preferredButtonWidth) {
+            gap = 4;
+            resetWidth = Math.max(120, availableButtonWidth * 2 / 5);
+            actionWidth = Math.max(1, (availableButtonWidth - resetWidth - gap * 2) / 2);
+        }
         int totalWidth = resetWidth + actionWidth * 2 + gap * 2;
         int buttonLeft = center - totalWidth / 2;
 
@@ -86,7 +95,9 @@ public final class ConfigScreen extends Screen {
     }
 
     private TextFieldWidget createNumberField(int x, int y, Text message, String value, Text placeholder) {
-        TextFieldWidget field = new TextFieldWidget(this.textRenderer, x, y, Math.min(760, Math.max(300, this.width - 120)), 20, message);
+        int horizontalMargin = Math.min(60, Math.max(12, this.width / 8));
+        int fieldWidth = Math.min(760, Math.max(180, this.width - horizontalMargin * 2));
+        TextFieldWidget field = new TextFieldWidget(this.textRenderer, x, y, fieldWidth, 20, message);
         field.setMaxLength(12);
         field.setText(value);
         field.setTextPredicate(input -> input.matches("[0-9]*([.][0-9]*)?"));
