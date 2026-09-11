@@ -64,11 +64,17 @@ public final class EMFDistanceCutoffMod implements ClientModInitializer {
                 ? override.animationPauseDistanceBlocks
                 : config.animationPauseDistanceBlocks;
 
-        if (pauseDistance <= 0.0 || modelDistance <= 0.0) return false;
-        if (pauseDistance >= modelDistance) return false;
-
         double distanceSquared = distanceSquared(entity, minecraft);
-        // Preserve the intended three tiers: animated EMF, frozen EMF, then vanilla.
+        if (pauseDistance <= 0.0) return false;
+
+        // A cutoff of zero means the model never falls back to vanilla. The
+        // animation-freeze tier is still valid and continues indefinitely.
+        if (modelDistance == 0.0) {
+            return distanceSquared >= pauseDistance * pauseDistance;
+        }
+
+        if (modelDistance < 0.0 || pauseDistance >= modelDistance) return false;
+        // Preserve the normal three tiers: animated EMF, frozen EMF, then vanilla.
         return distanceSquared >= pauseDistance * pauseDistance
                 && distanceSquared <= modelDistance * modelDistance;
     }
