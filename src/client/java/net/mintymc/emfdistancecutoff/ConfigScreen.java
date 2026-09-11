@@ -10,15 +10,18 @@ import net.minecraft.network.chat.Component;
 import java.util.Locale;
 
 public final class ConfigScreen extends Screen {
-    private static final int TITLE_Y = 12;
-    private static final int GLOBAL_LABEL_Y = 38;
-    private static final int GLOBAL_FIELD_Y = 54;
-    private static final int ENTITY_LABEL_Y = 82;
-    private static final int SEARCH_Y = 98;
+    private static final int TITLE_Y = 8;
+    private static final int GLOBAL_LABEL_Y = 27;
+    private static final int GLOBAL_FIELD_Y = 39;
+    private static final int ANIMATION_LABEL_Y = 64;
+    private static final int ANIMATION_FIELD_Y = 76;
+    private static final int SEARCH_Y = 103;
+    private static final int ENTITY_LABEL_Y = 128;
 
     private final Screen parent;
     private final CutoffConfig config;
     private EditBox globalDistanceField;
+    private EditBox animationPauseDistanceField;
     private EditBox searchField;
     private EntityListWidget entityList;
 
@@ -33,16 +36,22 @@ public final class ConfigScreen extends Screen {
         super.init();
 
         int center = this.width / 2;
-        int fieldWidth = Math.min(320, Math.max(180, this.width - 80));
+        int fieldWidth = Math.min(760, Math.max(300, this.width - 120));
+        int left = center - fieldWidth / 2;
 
-        globalDistanceField = new EditBox(this.font, center - fieldWidth / 2, GLOBAL_FIELD_Y, fieldWidth, 20,
-                Component.translatable("emf_distance_cutoff.global_distance"));
-        globalDistanceField.setMaxLength(12);
-        globalDistanceField.setValue(format(config.cutoffDistanceBlocks));
-        globalDistanceField.setHint(Component.translatable("emf_distance_cutoff.distance_placeholder"));
+        globalDistanceField = createNumberField(left, GLOBAL_FIELD_Y,
+                Component.translatable("emf_distance_cutoff.global_distance"),
+                format(config.cutoffDistanceBlocks),
+                Component.translatable("emf_distance_cutoff.distance_placeholder"));
         addRenderableWidget(globalDistanceField);
 
-        searchField = new EditBox(this.font, center - fieldWidth / 2, SEARCH_Y, fieldWidth, 20,
+        animationPauseDistanceField = createNumberField(left, ANIMATION_FIELD_Y,
+                Component.translatable("emf_distance_cutoff.animation_pause_distance"),
+                format(config.animationPauseDistanceBlocks),
+                Component.translatable("emf_distance_cutoff.animation_pause_placeholder"));
+        addRenderableWidget(animationPauseDistanceField);
+
+        searchField = new EditBox(this.font, left, SEARCH_Y, fieldWidth, 20,
                 Component.translatable("emf_distance_cutoff.search"));
         searchField.setMaxLength(64);
         searchField.setHint(Component.translatable("emf_distance_cutoff.search_placeholder"));
@@ -51,35 +60,43 @@ public final class ConfigScreen extends Screen {
         });
         addRenderableWidget(searchField);
 
-        int listTop = SEARCH_Y + 28;
+        int listTop = ENTITY_LABEL_Y + 16;
         int listBottom = this.height - 66;
-        int listWidth = Math.min(760, Math.max(220, this.width - 80));
+        int listWidth = Math.min(1000, Math.max(300, this.width - 80));
         entityList = new EntityListWidget(Minecraft.getInstance(), listWidth,
                 Math.max(80, listBottom - listTop), listTop, 34, this);
         entityList.rebuild(searchField.getValue());
         addRenderableWidget(entityList);
 
-        int bottomY = this.height - 30;
-        int resetWidth = Math.min(170, Math.max(120, this.width - 40));
+        int buttonY = this.height - 40;
+        int resetWidth = 230;
+        int actionWidth = 130;
+        int gap = 10;
+        int totalWidth = resetWidth + actionWidth * 2 + gap * 2;
+        int buttonLeft = center - totalWidth / 2;
+
         addRenderableWidget(Button.builder(Component.translatable("emf_distance_cutoff.reset_all"), button -> resetAll())
-                .bounds(center - resetWidth / 2, this.height - 56, resetWidth, 20).build());
+                .bounds(buttonLeft, buttonY, resetWidth, 20).build());
         addRenderableWidget(Button.builder(Component.translatable("emf_distance_cutoff.save"), button -> saveAndClose())
-                .bounds(center - 100, bottomY, 95, 20).build());
+                .bounds(buttonLeft + resetWidth + gap, buttonY, actionWidth, 20).build());
         addRenderableWidget(Button.builder(Component.translatable("emf_distance_cutoff.cancel"), button -> onClose())
-                .bounds(center + 5, bottomY, 95, 20).build());
+                .bounds(buttonLeft + resetWidth + gap + actionWidth + gap, buttonY, actionWidth, 20).build());
     }
 
     private void resetAll() {
         config.resetAll();
-        globalDistanceField.setValue(format(CutoffConfig.DEFAULT_DISTANCE_BLOCKS));
+        globalDistanceField.setValue(format(config.cutoffDistanceBlocks));
+        animationPauseDistanceField.setValue(format(config.animationPauseDistanceBlocks));
         if (entityList != null) entityList.rebuild(searchField.getValue());
         CutoffConfig.save();
     }
 
     private void saveAndClose() {
-        Double value = parsePositiveOrZero(globalDistanceField.getValue());
-        if (value != null) {
-            config.cutoffDistanceBlocks = value;
+        Double modelDistance = parsePositiveOrZero(globalDistanceField.getValue());
+        Double pauseDistance = parsePositiveOrZero(animationPauseDistanceField.getValue());
+        if (modelDistance != null && pauseDistance != null) {
+            config.cutoffDistanceBlocks = modelDistance;
+            config.animationPauseDistanceBlocks = pauseDistance;
             CutoffConfig.save();
             onClose();
         }
@@ -109,6 +126,8 @@ public final class ConfigScreen extends Screen {
         graphics.centeredText(this.font, this.title, this.width / 2, TITLE_Y, 0xFFFFFFFF);
         graphics.centeredText(this.font,
                 Component.translatable("emf_distance_cutoff.global_distance_label"), this.width / 2, GLOBAL_LABEL_Y, 0xFFFFFFFF);
+        graphics.centeredText(this.font,
+                Component.translatable("emf_distance_cutoff.animation_pause_distance_label"), this.width / 2, ANIMATION_LABEL_Y, 0xFFFFFFFF);
         graphics.centeredText(this.font,
                 Component.translatable("emf_distance_cutoff.entities"), this.width / 2, ENTITY_LABEL_Y, 0xFFFFFFFF);
         super.extractRenderState(graphics, mouseX, mouseY, delta);
