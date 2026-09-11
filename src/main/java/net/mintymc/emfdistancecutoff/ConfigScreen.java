@@ -62,6 +62,7 @@ public final class ConfigScreen extends Screen {
         int listBottom = this.height - 48;
         int listWidth = fieldWidth;
         entityList = new EntityListWidget(this.client, listWidth, Math.max(80, listBottom - listTop), listTop, 28, this);
+        entityList.setX(left);
         entityList.rebuild(searchField.getText());
         addDrawableChild(entityList);
 
@@ -134,13 +135,11 @@ public final class ConfigScreen extends Screen {
     @Override
     public void render(DrawContext context, int mouseX, int mouseY, float delta) {
         renderBackground(context, mouseX, mouseY, delta);
-        int center = this.width / 2;
         super.render(context, mouseX, mouseY, delta);
-        // Screen#render draws the background after child widgets on this game
-        // version, so labels must be drawn last to remain visible.
-        context.drawCenteredTextWithShadow(this.textRenderer, this.title, center, TITLE_Y, 0xFFFFFF);
-        context.drawCenteredTextWithShadow(this.textRenderer, Text.translatable("emf_distance_cutoff.global_distance_label"), center, GLOBAL_LABEL_Y, 0xFFFFFF);
-        context.drawCenteredTextWithShadow(this.textRenderer, Text.translatable("emf_distance_cutoff.animation_pause_distance_label"), center, ANIMATION_LABEL_Y, 0xFFFFFF);
-        context.drawCenteredTextWithShadow(this.textRenderer, Text.translatable("emf_distance_cutoff.entities"), center, ENTITY_LABEL_Y, 0xFFFFFF);
+        int horizontalMargin = Math.min(60, Math.max(12, this.width / 8));
+        int fieldWidth = Math.min(760, Math.max(180, this.width - horizontalMargin * 2));
+        int left = this.width / 2 - fieldWidth / 2;
+        context.drawTextWithShadow(this.textRenderer, Text.translatable("emf_distance_cutoff.global_distance_label"), left + 2, GLOBAL_LABEL_Y, 0xFFFFFF);
+        context.drawTextWithShadow(this.textRenderer, Text.translatable("emf_distance_cutoff.animation_pause_distance_label"), left + 2, ANIMATION_LABEL_Y, 0xFFFFFF);
     }
 }

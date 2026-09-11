@@ -50,7 +50,7 @@ public final class EntityListWidget extends ElementListWidget<EntityListWidget.E
     public int getRowWidth() {
         // EntryListWidget defaults to a narrow 220-pixel row even when the
         // scroll area is wider. Use the available width for readable labels.
-        return Math.max(100, getWidth() - 12);
+        return Math.max(100, getWidth() - 24);
     }
 
     /** Entry type must be accessible because it is exposed by ElementListWidget's generic type. */
