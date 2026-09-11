@@ -54,10 +54,10 @@ public final class EntityConfigScreen extends Screen {
         CutoffConfig.EntityOverride override = config.getOverride(entityId.toString());
         enabled = override == null || override.enabled;
         // Custom mode is intentionally the default when opening the screen so the field is immediately editable.
-        // A new entry opens in directly-editable custom mode, while a saved
-        // entry that explicitly uses the global value restores that state.
-        useGlobal = override != null && override.distanceBlocks == null;
-        useGlobalAnimationPause = override != null && override.animationPauseDistanceBlocks == null;
+        // New entries use the global values. Users explicitly opt in to each
+        // individual value with a toggle, matching Sodium's toggle behavior.
+        useGlobal = override == null || override.distanceBlocks == null;
+        useGlobalAnimationPause = override == null || override.animationPauseDistanceBlocks == null;
 
         int left = contentLeft();
         int width = contentWidth();
@@ -75,13 +75,13 @@ public final class EntityConfigScreen extends Screen {
                         : ConfigScreen.format(config.cutoffDistanceBlocks),
                 Component.translatable("emf_distance_cutoff.distance_placeholder"));
         // Keep this immediately editable when entering the screen.
-        distanceField.setEditable(true);
+        updateDistanceFieldState();
         addRenderableWidget(distanceField);
 
         addRenderableWidget(Button.builder(modeButtonText(), button -> {
             useGlobal = !useGlobal;
             if (useGlobal) distanceField.setValue(ConfigScreen.format(config.cutoffDistanceBlocks));
-            distanceField.setEditable(!useGlobal);
+            updateDistanceFieldState();
             distanceField.setFocused(!useGlobal);
             button.setMessage(modeButtonText());
         }).bounds(left, top + 145, width, 20).build());
@@ -92,7 +92,7 @@ public final class EntityConfigScreen extends Screen {
                         ? ConfigScreen.format(override.animationPauseDistanceBlocks)
                         : ConfigScreen.format(config.animationPauseDistanceBlocks),
                 Component.translatable("emf_distance_cutoff.animation_pause_placeholder"));
-        animationPauseDistanceField.setEditable(true);
+        updateAnimationPauseFieldState();
         addRenderableWidget(animationPauseDistanceField);
 
         addRenderableWidget(Button.builder(animationModeButtonText(), button -> {
@@ -100,7 +100,7 @@ public final class EntityConfigScreen extends Screen {
             if (useGlobalAnimationPause) {
                 animationPauseDistanceField.setValue(ConfigScreen.format(config.animationPauseDistanceBlocks));
             }
-            animationPauseDistanceField.setEditable(!useGlobalAnimationPause);
+            updateAnimationPauseFieldState();
             animationPauseDistanceField.setFocused(!useGlobalAnimationPause);
             button.setMessage(animationModeButtonText());
         }).bounds(left, top + 231, width, 20).build());
@@ -133,17 +133,21 @@ public final class EntityConfigScreen extends Screen {
     }
 
     private Component modeButtonText() {
-        return Component.translatable(useGlobal
-                ? "emf_distance_cutoff.use_custom_with_value"
-                : "emf_distance_cutoff.use_global_with_value",
-                ConfigScreen.format(useGlobal ? config.cutoffDistanceBlocks : parseFieldOrGlobal()));
+        return Component.translatable("emf_distance_cutoff.individual_model_toggle",
+                Component.translatable(useGlobal ? "emf_distance_cutoff.off" : "emf_distance_cutoff.on"));
     }
 
     private Component animationModeButtonText() {
-        return Component.translatable(useGlobalAnimationPause
-                ? "emf_distance_cutoff.use_custom_animation_pause_with_value"
-                : "emf_distance_cutoff.use_global_animation_pause_with_value",
-                ConfigScreen.format(useGlobalAnimationPause ? config.animationPauseDistanceBlocks : parseAnimationPauseFieldOrGlobal()));
+        return Component.translatable("emf_distance_cutoff.individual_pause_toggle",
+                Component.translatable(useGlobalAnimationPause ? "emf_distance_cutoff.off" : "emf_distance_cutoff.on"));
+    }
+
+    private void updateDistanceFieldState() {
+        distanceField.setEditable(!useGlobal);
+    }
+
+    private void updateAnimationPauseFieldState() {
+        animationPauseDistanceField.setEditable(!useGlobalAnimationPause);
     }
 
     private double parseFieldOrGlobal() {
