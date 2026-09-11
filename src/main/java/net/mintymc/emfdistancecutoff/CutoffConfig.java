@@ -44,6 +44,17 @@ public final class CutoffConfig {
         } catch (IOException ignored) { }
     }
     public EntityOverride getOverride(String entityId) { return entities.get(entityId); }
+    /**
+     * EMF normally supplies registry ids such as minecraft:creeper, but some
+     * compatibility render paths omit minecraft:.  GUI settings always use
+     * canonical registry ids, so accept that equivalent spelling too.
+     */
+    public EntityOverride getOverrideForEmfType(String entityId) {
+        if (entityId == null || entityId.isBlank()) return null;
+        EntityOverride direct = entities.get(entityId);
+        if (direct != null || entityId.indexOf(':') >= 0) return direct;
+        return entities.get("minecraft:" + entityId);
+    }
     public EntityOverride getOrCreateOverride(String entityId) { return entities.computeIfAbsent(entityId, id -> new EntityOverride()); }
     public void resetOverride(String entityId) { entities.remove(entityId); }
     public void resetAll() {

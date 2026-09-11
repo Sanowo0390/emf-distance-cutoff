@@ -4,6 +4,7 @@ import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.gui.widget.TextFieldWidget;
+import net.minecraft.client.gui.widget.TextWidget;
 import net.minecraft.text.Text;
 
 import java.util.Locale;
@@ -38,6 +39,16 @@ public final class ConfigScreen extends Screen {
         int horizontalMargin = Math.min(60, Math.max(12, this.width / 8));
         int fieldWidth = Math.min(760, Math.max(180, this.width - horizontalMargin * 2));
         int left = center - fieldWidth / 2;
+
+        // Use real GUI widgets for these labels.  In 1.21.11's extracted GUI
+        // renderer, text emitted directly from Screen#render can be submitted
+        // behind later widget layers on some modded render pipelines.
+        Text modelLabel = Text.translatable("emf_distance_cutoff.global_distance_label");
+        Text pauseLabel = Text.translatable("emf_distance_cutoff.animation_pause_distance_label");
+        addDrawableChild(new TextWidget(left + 2, GLOBAL_LABEL_Y, this.textRenderer.getWidth(modelLabel), 9,
+                modelLabel, this.textRenderer));
+        addDrawableChild(new TextWidget(left + 2, ANIMATION_LABEL_Y, this.textRenderer.getWidth(pauseLabel), 9,
+                pauseLabel, this.textRenderer));
 
         globalDistanceField = createNumberField(left, GLOBAL_FIELD_Y,
                 Text.translatable("emf_distance_cutoff.global_distance"),
@@ -136,10 +147,5 @@ public final class ConfigScreen extends Screen {
     public void render(DrawContext context, int mouseX, int mouseY, float delta) {
         renderBackground(context, mouseX, mouseY, delta);
         super.render(context, mouseX, mouseY, delta);
-        int horizontalMargin = Math.min(60, Math.max(12, this.width / 8));
-        int fieldWidth = Math.min(760, Math.max(180, this.width - horizontalMargin * 2));
-        int left = this.width / 2 - fieldWidth / 2;
-        context.drawTextWithShadow(this.textRenderer, Text.translatable("emf_distance_cutoff.global_distance_label"), left + 2, GLOBAL_LABEL_Y, 0xFFFFFF);
-        context.drawTextWithShadow(this.textRenderer, Text.translatable("emf_distance_cutoff.animation_pause_distance_label"), left + 2, ANIMATION_LABEL_Y, 0xFFFFFF);
     }
 }

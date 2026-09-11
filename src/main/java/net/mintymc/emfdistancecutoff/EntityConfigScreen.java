@@ -38,8 +38,10 @@ public final class EntityConfigScreen extends Screen {
         CutoffConfig.EntityOverride override = config.getOverride(entityId.toString());
         enabled = override == null || override.enabled;
         // Custom mode is intentionally the default when opening the screen so the fields are immediately editable.
-        useGlobal = false;
-        useGlobalAnimationPause = false;
+        // A new entry opens in directly-editable custom mode, while a saved
+        // entry that explicitly uses the global value restores that state.
+        useGlobal = override != null && override.distanceBlocks == null;
+        useGlobalAnimationPause = override != null && override.animationPauseDistanceBlocks == null;
 
         int center = this.width / 2;
         boolean compact = this.height < 340;
@@ -67,7 +69,7 @@ public final class EntityConfigScreen extends Screen {
                         ? ConfigScreen.format(override.distanceBlocks)
                         : ConfigScreen.format(config.cutoffDistanceBlocks),
                 Text.translatable("emf_distance_cutoff.distance_placeholder"));
-        distanceField.active = true;
+        distanceField.active = !useGlobal;
         addDrawableChild(distanceField);
 
         addDrawableChild(ButtonWidget.builder(modeButtonText(), button -> {
@@ -84,7 +86,7 @@ public final class EntityConfigScreen extends Screen {
                         ? ConfigScreen.format(override.animationPauseDistanceBlocks)
                         : ConfigScreen.format(config.animationPauseDistanceBlocks),
                 Text.translatable("emf_distance_cutoff.animation_pause_placeholder"));
-        animationPauseDistanceField.active = true;
+        animationPauseDistanceField.active = !useGlobalAnimationPause;
         addDrawableChild(animationPauseDistanceField);
 
         addDrawableChild(ButtonWidget.builder(animationModeButtonText(), button -> {
