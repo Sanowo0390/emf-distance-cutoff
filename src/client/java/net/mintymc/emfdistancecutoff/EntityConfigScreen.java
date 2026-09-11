@@ -10,15 +10,17 @@ import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.EntityType;
 
 public final class EntityConfigScreen extends Screen {
-    private static final int CONTENT_WIDTH = 320;
-    private static final int CONTENT_HEIGHT = 268;
+    private static final int CONTENT_WIDTH = 360;
+    private static final int CONTENT_HEIGHT = 350;
 
     private final Screen parent;
     private final Identifier entityId;
     private final CutoffConfig config;
     private EditBox distanceField;
+    private EditBox animationPauseDistanceField;
     private boolean enabled;
     private boolean useGlobal;
+    private boolean useGlobalAnimationPause;
 
     public EntityConfigScreen(Screen parent, Identifier entityId) {
         super(titleFor(entityId));
@@ -51,7 +53,9 @@ public final class EntityConfigScreen extends Screen {
 
         CutoffConfig.EntityOverride override = config.getOverride(entityId.toString());
         enabled = override == null || override.enabled;
+        // Custom mode is intentionally the default when opening the screen so the field is immediately editable.
         useGlobal = override != null && override.distanceBlocks == null;
+        useGlobalAnimationPause = override == null || override.animationPauseDistanceBlocks == null;
 
         int left = contentLeft();
         int width = contentWidth();
@@ -60,39 +64,64 @@ public final class EntityConfigScreen extends Screen {
         addRenderableWidget(Button.builder(enabledText(), button -> {
             enabled = !enabled;
             button.setMessage(enabledText());
-        }).bounds(left, top + 66, width, 20).build());
+        }).bounds(left, top + 58, width, 20).build());
 
-        distanceField = new EditBox(this.font, left, top + 126, width, 20,
-                Component.translatable("emf_distance_cutoff.custom_distance"));
-        distanceField.setMaxLength(12);
-        distanceField.setValue(override != null && override.distanceBlocks != null
-                ? ConfigScreen.format(override.distanceBlocks)
-                : ConfigScreen.format(config.cutoffDistanceBlocks));
-        distanceField.setHint(Component.translatable("emf_distance_cutoff.distance_placeholder"));
-        distanceField.setEditable(!useGlobal);
+        distanceField = createNumberField(left, top + 116,
+                Component.translatable("emf_distance_cutoff.custom_distance"),
+                override != null && override.distanceBlocks != null
+                        ? ConfigScreen.format(override.distanceBlocks)
+                        : ConfigScreen.format(config.cutoffDistanceBlocks),
+                Component.translatable("emf_distance_cutoff.distance_placeholder"));
+        // Keep this immediately editable when entering the screen.
+        distanceField.setEditable(true);
         addRenderableWidget(distanceField);
 
         addRenderableWidget(Button.builder(modeButtonText(), button -> {
             useGlobal = !useGlobal;
-            if (useGlobal) {
-                distanceField.setValue(ConfigScreen.format(config.cutoffDistanceBlocks));
-            }
+            if (useGlobal) distanceField.setValue(ConfigScreen.format(config.cutoffDistanceBlocks));
             distanceField.setEditable(!useGlobal);
             distanceField.setFocused(!useGlobal);
             button.setMessage(modeButtonText());
-        }).bounds(left, top + 155, width, 20).build());
+        }).bounds(left, top + 145, width, 20).build());
+
+        animationPauseDistanceField = createNumberField(left, top + 202,
+                Component.translatable("emf_distance_cutoff.animation_pause_distance"),
+                override != null && override.animationPauseDistanceBlocks != null
+                        ? ConfigScreen.format(override.animationPauseDistanceBlocks)
+                        : ConfigScreen.format(config.animationPauseDistanceBlocks),
+                Component.translatable("emf_distance_cutoff.animation_pause_placeholder"));
+        animationPauseDistanceField.setEditable(true);
+        addRenderableWidget(animationPauseDistanceField);
+
+        addRenderableWidget(Button.builder(animationModeButtonText(), button -> {
+            useGlobalAnimationPause = !useGlobalAnimationPause;
+            if (useGlobalAnimationPause) {
+                animationPauseDistanceField.setValue(ConfigScreen.format(config.animationPauseDistanceBlocks));
+            }
+            animationPauseDistanceField.setEditable(!useGlobalAnimationPause);
+            animationPauseDistanceField.setFocused(!useGlobalAnimationPause);
+            button.setMessage(animationModeButtonText());
+        }).bounds(left, top + 231, width, 20).build());
 
         addRenderableWidget(Button.builder(Component.translatable("emf_distance_cutoff.reset"), button -> {
             config.resetOverride(entityId.toString());
             CutoffConfig.save();
             onClose();
-        }).bounds(left, top + 184, width, 20).build());
+        }).bounds(left, top + 260, width, 20).build());
 
         int half = (width - 8) / 2;
         addRenderableWidget(Button.builder(Component.translatable("emf_distance_cutoff.save"), button -> save())
-                .bounds(left, top + 213, half, 20).build());
+                .bounds(left, top + 289, half, 20).build());
         addRenderableWidget(Button.builder(Component.translatable("emf_distance_cutoff.cancel"), button -> onClose())
-                .bounds(left + half + 8, top + 213, half, 20).build());
+                .bounds(left + half + 8, top + 289, half, 20).build());
+    }
+
+    private EditBox createNumberField(int x, int y, Component message, String value, Component hint) {
+        EditBox field = new EditBox(this.font, x, y, contentWidth(), 20, message);
+        field.setMaxLength(12);
+        field.setValue(value);
+        field.setHint(hint);
+        return field;
     }
 
     private Component enabledText() {
@@ -108,6 +137,13 @@ public final class EntityConfigScreen extends Screen {
                 ConfigScreen.format(useGlobal ? config.cutoffDistanceBlocks : parseFieldOrGlobal()));
     }
 
+    private Component animationModeButtonText() {
+        return Component.translatable(useGlobalAnimationPause
+                ? "emf_distance_cutoff.use_custom_animation_pause_with_value"
+                : "emf_distance_cutoff.use_global_animation_pause_with_value",
+                ConfigScreen.format(useGlobalAnimationPause ? config.animationPauseDistanceBlocks : parseAnimationPauseFieldOrGlobal()));
+    }
+
     private double parseFieldOrGlobal() {
         try {
             double value = Double.parseDouble(distanceField.getValue());
@@ -117,16 +153,25 @@ public final class EntityConfigScreen extends Screen {
         }
     }
 
+    private double parseAnimationPauseFieldOrGlobal() {
+        try {
+            double value = Double.parseDouble(animationPauseDistanceField.getValue());
+            return Double.isFinite(value) ? value : config.animationPauseDistanceBlocks;
+        } catch (NumberFormatException e) {
+            return config.animationPauseDistanceBlocks;
+        }
+    }
+
     private void save() {
         CutoffConfig.EntityOverride override = config.getOrCreateOverride(entityId.toString());
         override.enabled = enabled;
-        if (useGlobal) {
-            override.distanceBlocks = null;
-        } else {
-            Double parsed = parsePositiveOrZero(distanceField.getValue());
-            if (parsed == null) return;
-            override.distanceBlocks = parsed;
-        }
+
+        Double parsedDistance = parsePositiveOrZero(distanceField.getValue());
+        Double parsedAnimationPause = parsePositiveOrZero(animationPauseDistanceField.getValue());
+        if (parsedDistance == null || parsedAnimationPause == null) return;
+
+        override.distanceBlocks = useGlobal ? null : parsedDistance;
+        override.animationPauseDistanceBlocks = useGlobalAnimationPause ? null : parsedAnimationPause;
         CutoffConfig.save();
         onClose();
     }
@@ -151,8 +196,9 @@ public final class EntityConfigScreen extends Screen {
         int top = contentTop();
         graphics.centeredText(this.font, this.title, center, top + 6, 0xFFFFFFFF);
         graphics.centeredText(this.font, Component.literal(entityId.toString()), center, top + 25, 0xFFAAAAAA);
-        graphics.centeredText(this.font, Component.translatable("emf_distance_cutoff.enabled_label"), center, top + 53, 0xFFFFFFFF);
-        graphics.centeredText(this.font, Component.translatable("emf_distance_cutoff.custom_distance_label"), center, top + 113, 0xFFFFFFFF);
+        graphics.centeredText(this.font, Component.translatable("emf_distance_cutoff.enabled_label"), center, top + 47, 0xFFFFFFFF);
+        graphics.centeredText(this.font, Component.translatable("emf_distance_cutoff.custom_distance_label"), center, top + 103, 0xFFFFFFFF);
+        graphics.centeredText(this.font, Component.translatable("emf_distance_cutoff.animation_pause_distance_label"), center, top + 189, 0xFFFFFFFF);
         super.extractRenderState(graphics, mouseX, mouseY, delta);
     }
 }
