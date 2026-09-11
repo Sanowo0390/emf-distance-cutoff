@@ -19,6 +19,7 @@ public final class EMFDistanceCutoffMod implements ClientModInitializer {
     }
 
     private static Boolean shouldUseVanillaModel(EMFEntity entity) {
+        if (entity == null) return false;
         MinecraftClient client = MinecraftClient.getInstance();
         if (client.player == null) return false;
         String entityId = EntityIdResolver.resolve(entity);
@@ -38,6 +39,9 @@ public final class EMFDistanceCutoffMod implements ClientModInitializer {
      * poses.  The mixin restores a complete cached pose instead.</p>
      */
     public static boolean shouldFreezeAnimations(EMFEntity entity) {
+        // Some model previews and non-entity render passes do not install an
+        // EMF entity context.  They must keep EMF's normal animation path.
+        if (entity == null) return false;
         MinecraftClient client = MinecraftClient.getInstance();
         if (client.player == null) return false;
         String entityId = EntityIdResolver.resolve(entity);
