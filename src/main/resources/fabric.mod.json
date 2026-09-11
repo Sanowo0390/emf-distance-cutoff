@@ -16,6 +16,9 @@
     "client": ["net.mintymc.emfdistancecutoff.EMFDistanceCutoffMod"],
     "modmenu": ["net.mintymc.emfdistancecutoff.ModMenuIntegration"]
   },
+  "mixins": [
+    "emf_distance_cutoff.mixins.json"
+  ],
   "depends": {
     "fabricloader": ">=0.18.0",
     "minecraft": "1.21.11",

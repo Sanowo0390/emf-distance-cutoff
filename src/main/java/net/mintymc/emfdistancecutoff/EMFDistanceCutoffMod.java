@@ -13,7 +13,6 @@ public final class EMFDistanceCutoffMod implements ClientModInitializer {
         CutoffConfig.load();
         try {
             EMFAnimationApi.registerVanillaModelCondition(EMFDistanceCutoffMod::shouldUseVanillaModel);
-            EMFAnimationApi.registerPauseCondition(EMFDistanceCutoffMod::shouldPauseAnimations);
         } catch (Exception e) {
             throw new RuntimeException("[emf_distance_cutoff] Failed to register the EMF performance conditions. Make sure Entity Model Features is installed and up to date.", e);
         }
@@ -31,7 +30,14 @@ public final class EMFDistanceCutoffMod implements ClientModInitializer {
         return distanceSquared(entity, client) > distance * distance;
     }
 
-    private static Boolean shouldPauseAnimations(EMFEntity entity) {
+    /**
+     * Whether this entity should reuse its last complete EMF pose.
+     *
+     * <p>EMF 3.0.x's pause API skips its model animation run entirely.  The
+     * vanilla setup still resets parts, so that can leave a model with mixed
+     * poses.  The mixin restores a complete cached pose instead.</p>
+     */
+    public static boolean shouldFreezeAnimations(EMFEntity entity) {
         MinecraftClient client = MinecraftClient.getInstance();
         if (client.player == null) return false;
         String entityId = EntityIdResolver.resolve(entity);
@@ -45,9 +51,11 @@ public final class EMFDistanceCutoffMod implements ClientModInitializer {
                 ? override.animationPauseDistanceBlocks : config.animationPauseDistanceBlocks;
 
         if (pauseDistance <= 0.0 || modelDistance <= 0.0) return false;
-        // Never pause outside the range where this mod still allows the EMF model.
         if (pauseDistance >= modelDistance) return false;
-        return distanceSquared(entity, client) >= pauseDistance * pauseDistance;
+
+        double distanceSquared = distanceSquared(entity, client);
+        return distanceSquared >= pauseDistance * pauseDistance
+                && distanceSquared <= modelDistance * modelDistance;
     }
 
     private static double distanceSquared(EMFEntity entity, MinecraftClient client) {
