@@ -9,15 +9,18 @@ import net.minecraft.text.Text;
 import java.util.Locale;
 
 public final class ConfigScreen extends Screen {
-    private static final int TITLE_Y = 10;
-    private static final int GLOBAL_LABEL_Y = 30;
-    private static final int GLOBAL_FIELD_Y = 42;
-    private static final int SEARCH_Y = 72;
-    private static final int ENTITY_LABEL_Y = 98;
+    private static final int TITLE_Y = 8;
+    private static final int GLOBAL_LABEL_Y = 27;
+    private static final int GLOBAL_FIELD_Y = 39;
+    private static final int ANIMATION_LABEL_Y = 64;
+    private static final int ANIMATION_FIELD_Y = 76;
+    private static final int SEARCH_Y = 103;
+    private static final int ENTITY_LABEL_Y = 128;
 
     private final Screen parent;
     private final CutoffConfig config;
     private TextFieldWidget globalDistanceField;
+    private TextFieldWidget animationPauseDistanceField;
     private TextFieldWidget searchField;
     private EntityListWidget entityList;
 
@@ -35,13 +38,17 @@ public final class ConfigScreen extends Screen {
         int fieldWidth = Math.min(760, Math.max(300, this.width - 120));
         int left = center - fieldWidth / 2;
 
-        globalDistanceField = new TextFieldWidget(this.textRenderer, left, GLOBAL_FIELD_Y, fieldWidth, 20,
-                Text.translatable("emf_distance_cutoff.global_distance"));
-        globalDistanceField.setMaxLength(12);
-        globalDistanceField.setText(format(config.cutoffDistanceBlocks));
-        globalDistanceField.setTextPredicate(value -> value.matches("[0-9]*([.][0-9]*)?"));
-        globalDistanceField.setPlaceholder(Text.translatable("emf_distance_cutoff.distance_placeholder"));
+        globalDistanceField = createNumberField(left, GLOBAL_FIELD_Y,
+                Text.translatable("emf_distance_cutoff.global_distance"),
+                format(config.cutoffDistanceBlocks),
+                Text.translatable("emf_distance_cutoff.distance_placeholder"));
         addDrawableChild(globalDistanceField);
+
+        animationPauseDistanceField = createNumberField(left, ANIMATION_FIELD_Y,
+                Text.translatable("emf_distance_cutoff.animation_pause_distance"),
+                format(config.animationPauseDistanceBlocks),
+                Text.translatable("emf_distance_cutoff.animation_pause_placeholder"));
+        addDrawableChild(animationPauseDistanceField);
 
         searchField = new TextFieldWidget(this.textRenderer, left, SEARCH_Y, fieldWidth, 20,
                 Text.translatable("emf_distance_cutoff.search"));
@@ -50,7 +57,7 @@ public final class ConfigScreen extends Screen {
         searchField.setChangedListener(value -> { if (entityList != null) entityList.rebuild(value); });
         addDrawableChild(searchField);
 
-        int listTop = ENTITY_LABEL_Y + 18;
+        int listTop = ENTITY_LABEL_Y + 16;
         int listBottom = this.height - 58;
         int listWidth = Math.min(1000, Math.max(300, this.width - 80));
         entityList = new EntityListWidget(this.client, listWidth, Math.max(80, listBottom - listTop), listTop, 28, this);
@@ -67,6 +74,7 @@ public final class ConfigScreen extends Screen {
         addDrawableChild(ButtonWidget.builder(Text.translatable("emf_distance_cutoff.reset_all"), button -> {
             config.resetAll();
             globalDistanceField.setText(format(config.cutoffDistanceBlocks));
+            animationPauseDistanceField.setText(format(config.animationPauseDistanceBlocks));
             if (entityList != null) entityList.rebuild(searchField.getText());
             CutoffConfig.save();
         }).dimensions(buttonLeft, buttonY, resetWidth, 20).build());
@@ -77,10 +85,21 @@ public final class ConfigScreen extends Screen {
                 .dimensions(buttonLeft + resetWidth + gap + actionWidth + gap, buttonY, actionWidth, 20).build());
     }
 
+    private TextFieldWidget createNumberField(int x, int y, Text message, String value, Text placeholder) {
+        TextFieldWidget field = new TextFieldWidget(this.textRenderer, x, y, Math.min(760, Math.max(300, this.width - 120)), 20, message);
+        field.setMaxLength(12);
+        field.setText(value);
+        field.setTextPredicate(input -> input.matches("[0-9]*([.][0-9]*)?"));
+        field.setPlaceholder(placeholder);
+        return field;
+    }
+
     private void saveAndClose() {
-        Double value = parsePositiveOrZero(globalDistanceField.getText());
-        if (value != null) {
-            config.cutoffDistanceBlocks = value;
+        Double modelDistance = parsePositiveOrZero(globalDistanceField.getText());
+        Double pauseDistance = parsePositiveOrZero(animationPauseDistanceField.getText());
+        if (modelDistance != null && pauseDistance != null) {
+            config.cutoffDistanceBlocks = modelDistance;
+            config.animationPauseDistanceBlocks = pauseDistance;
             CutoffConfig.save();
             close();
         }
@@ -107,6 +126,7 @@ public final class ConfigScreen extends Screen {
         int center = this.width / 2;
         context.drawCenteredTextWithShadow(this.textRenderer, this.title, center, TITLE_Y, 0xFFFFFF);
         context.drawCenteredTextWithShadow(this.textRenderer, Text.translatable("emf_distance_cutoff.global_distance_label"), center, GLOBAL_LABEL_Y, 0xFFFFFF);
+        context.drawCenteredTextWithShadow(this.textRenderer, Text.translatable("emf_distance_cutoff.animation_pause_distance_label"), center, ANIMATION_LABEL_Y, 0xFFFFFF);
         context.drawCenteredTextWithShadow(this.textRenderer, Text.translatable("emf_distance_cutoff.entities"), center, ENTITY_LABEL_Y, 0xFFFFFF);
         super.render(context, mouseX, mouseY, delta);
     }
