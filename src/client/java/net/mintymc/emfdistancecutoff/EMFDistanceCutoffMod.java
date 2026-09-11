@@ -13,7 +13,6 @@ public final class EMFDistanceCutoffMod implements ClientModInitializer {
         CutoffConfig.load();
         try {
             EMFAnimationApi.registerVanillaModelCondition(EMFDistanceCutoffMod::shouldUseVanillaModel);
-            EMFAnimationApi.registerPauseCondition(EMFDistanceCutoffMod::shouldPauseAnimations);
         } catch (Exception e) {
             throw new RuntimeException(
                     "[emf_distance_cutoff] Failed to register the EMF performance conditions. " +
@@ -40,7 +39,15 @@ public final class EMFDistanceCutoffMod implements ClientModInitializer {
         return distanceSquared(entity, minecraft) > distance * distance;
     }
 
-    private static Boolean shouldPauseAnimations(EMFEntity entity) {
+    /**
+     * Whether this entity should use its previously calculated EMF pose.
+     *
+     * <p>EMF 3.2.x's {@code registerPauseCondition} skips the complete model
+     * animation step.  That leaves freshly reset vanilla parts mixed with stale
+     * custom parts, which is why models can appear split apart.  The mixin uses
+     * this condition to restore one complete cached pose instead.</p>
+     */
+    public static boolean shouldFreezeAnimations(EMFEntity entity) {
         Minecraft minecraft = Minecraft.getInstance();
         if (minecraft.player == null) return false;
 
@@ -58,10 +65,12 @@ public final class EMFDistanceCutoffMod implements ClientModInitializer {
                 : config.animationPauseDistanceBlocks;
 
         if (pauseDistance <= 0.0 || modelDistance <= 0.0) return false;
-        // Never pause outside the range where this mod still allows the EMF model.
         if (pauseDistance >= modelDistance) return false;
 
-        return distanceSquared(entity, minecraft) >= pauseDistance * pauseDistance;
+        double distanceSquared = distanceSquared(entity, minecraft);
+        // Preserve the intended three tiers: animated EMF, frozen EMF, then vanilla.
+        return distanceSquared >= pauseDistance * pauseDistance
+                && distanceSquared <= modelDistance * modelDistance;
     }
 
     private static double distanceSquared(EMFEntity entity, Minecraft minecraft) {

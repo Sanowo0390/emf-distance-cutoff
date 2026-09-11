@@ -83,6 +83,15 @@ public final class ConfigScreen extends Screen {
                 .bounds(buttonLeft + resetWidth + gap + actionWidth + gap, buttonY, actionWidth, 20).build());
     }
 
+    private EditBox createNumberField(int x, int y, Component message, String value, Component hint) {
+        EditBox field = new EditBox(this.font, x, y,
+                Math.min(760, Math.max(300, this.width - 120)), 20, message);
+        field.setMaxLength(12);
+        field.setValue(value);
+        field.setHint(hint);
+        return field;
+    }
+
     private void resetAll() {
         config.resetAll();
         globalDistanceField.setValue(format(config.cutoffDistanceBlocks));

@@ -1,9 +1,9 @@
 {
 	"required": true,
-	"package": "com.example.client.mixin",
+	"package": "net.mintymc.emfdistancecutoff.mixin",
 	"compatibilityLevel": "JAVA_25",
 	"client": [
-		"ExampleClientMixin"
+		"EMFModelPartRootMixin"
 	],
 	"injectors": {
 		"defaultRequire": 1
