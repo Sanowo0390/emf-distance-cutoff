@@ -37,9 +37,9 @@ public final class EntityConfigScreen extends Screen {
 
         CutoffConfig.EntityOverride override = config.getOverride(entityId.toString());
         enabled = override == null || override.enabled;
-        // Custom mode is intentionally the default when opening the screen so the field is immediately editable.
-        useGlobal = override != null && override.distanceBlocks == null;
-        useGlobalAnimationPause = override == null || override.animationPauseDistanceBlocks == null;
+        // Custom mode is intentionally the default when opening the screen so the fields are immediately editable.
+        useGlobal = false;
+        useGlobalAnimationPause = false;
 
         int center = this.width / 2;
         int contentWidth = Math.min(520, Math.max(300, this.width - 80));
@@ -57,7 +57,6 @@ public final class EntityConfigScreen extends Screen {
                         ? ConfigScreen.format(override.distanceBlocks)
                         : ConfigScreen.format(config.cutoffDistanceBlocks),
                 Text.translatable("emf_distance_cutoff.distance_placeholder"));
-        // Keep this immediately editable when entering the screen.
         distanceField.active = true;
         addDrawableChild(distanceField);
 
