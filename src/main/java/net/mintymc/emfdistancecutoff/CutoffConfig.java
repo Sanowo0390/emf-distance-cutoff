@@ -15,9 +15,11 @@ import java.util.Map;
 
 public final class CutoffConfig {
     public static final double DEFAULT_DISTANCE_BLOCKS = 24.0;
+    public static final double DEFAULT_ANIMATION_PAUSE_DISTANCE_BLOCKS = 12.0;
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
     private static final Path CONFIG_PATH = FabricLoader.getInstance().getConfigDir().resolve("emf_distance_cutoff.json");
     public double cutoffDistanceBlocks = DEFAULT_DISTANCE_BLOCKS;
+    public double animationPauseDistanceBlocks = DEFAULT_ANIMATION_PAUSE_DISTANCE_BLOCKS;
     public Map<String, EntityOverride> entities = new LinkedHashMap<>();
     private static CutoffConfig instance;
 
@@ -46,10 +48,12 @@ public final class CutoffConfig {
     public void resetOverride(String entityId) { entities.remove(entityId); }
     public void resetAll() {
         cutoffDistanceBlocks = DEFAULT_DISTANCE_BLOCKS;
+        animationPauseDistanceBlocks = DEFAULT_ANIMATION_PAUSE_DISTANCE_BLOCKS;
         entities.clear();
     }
     public static final class EntityOverride {
         public boolean enabled = true;
         public Double distanceBlocks = null;
+        public Double animationPauseDistanceBlocks = null;
     }
 }
