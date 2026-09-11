@@ -1,9 +1,9 @@
 {
   "emf_distance_cutoff.title": "EMF Distance Cutoff",
   "emf_distance_cutoff.global_distance": "全体の距離",
-  "emf_distance_cutoff.global_distance_label": "全体の距離（ブロック）",
+  "emf_distance_cutoff.global_distance_label": "モデル無効化距離(ブロック)",
   "emf_distance_cutoff.animation_pause_distance": "アニメーション停止距離",
-  "emf_distance_cutoff.animation_pause_distance_label": "アニメーション停止距離（ブロック）",
+  "emf_distance_cutoff.animation_pause_distance_label": "モデル停止距離(ブロック)",
   "emf_distance_cutoff.animation_pause_placeholder": "停止距離を入力（例: 12）",
   "emf_distance_cutoff.entities": "Mob / Entity 設定",
   "emf_distance_cutoff.search": "検索",

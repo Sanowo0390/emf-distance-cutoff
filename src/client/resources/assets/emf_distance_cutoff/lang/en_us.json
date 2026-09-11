@@ -1,9 +1,9 @@
 {
   "emf_distance_cutoff.title": "EMF Distance Cutoff",
   "emf_distance_cutoff.global_distance": "Global distance",
-  "emf_distance_cutoff.global_distance_label": "Global distance (blocks)",
+  "emf_distance_cutoff.global_distance_label": "EMF model display distance (blocks)",
   "emf_distance_cutoff.animation_pause_distance": "Animation pause distance",
-  "emf_distance_cutoff.animation_pause_distance_label": "Animation pause distance (blocks)",
+  "emf_distance_cutoff.animation_pause_distance_label": "Animation freeze distance (blocks)",
   "emf_distance_cutoff.animation_pause_placeholder": "Enter pause distance (e.g. 12)",
   "emf_distance_cutoff.entities": "Mob / Entity Settings",
   "emf_distance_cutoff.search": "Search",

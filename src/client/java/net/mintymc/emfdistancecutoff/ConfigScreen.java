@@ -62,9 +62,9 @@ public final class ConfigScreen extends Screen {
 
         int listTop = ENTITY_LABEL_Y + 16;
         int listBottom = this.height - 66;
-        int listWidth = Math.min(1000, Math.max(300, this.width - 80));
-        entityList = new EntityListWidget(Minecraft.getInstance(), listWidth,
+        entityList = new EntityListWidget(Minecraft.getInstance(), fieldWidth,
                 Math.max(80, listBottom - listTop), listTop, 34, this);
+        entityList.setX(left);
         entityList.rebuild(searchField.getValue());
         addRenderableWidget(entityList);
 
@@ -132,13 +132,16 @@ public final class ConfigScreen extends Screen {
 
     @Override
     public void extractRenderState(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float delta) {
-        graphics.centeredText(this.font, this.title, this.width / 2, TITLE_Y, 0xFFFFFFFF);
-        graphics.centeredText(this.font,
-                Component.translatable("emf_distance_cutoff.global_distance_label"), this.width / 2, GLOBAL_LABEL_Y, 0xFFFFFFFF);
-        graphics.centeredText(this.font,
-                Component.translatable("emf_distance_cutoff.animation_pause_distance_label"), this.width / 2, ANIMATION_LABEL_Y, 0xFFFFFFFF);
-        graphics.centeredText(this.font,
-                Component.translatable("emf_distance_cutoff.entities"), this.width / 2, ENTITY_LABEL_Y, 0xFFFFFFFF);
         super.extractRenderState(graphics, mouseX, mouseY, delta);
+
+        // Submit labels after child widgets so their render state cannot cover them.
+        int fieldWidth = Math.min(760, Math.max(300, this.width - 120));
+        int left = this.width / 2 - fieldWidth / 2;
+        drawLeftAlignedLabel(graphics, Component.translatable("emf_distance_cutoff.global_distance_label"), left + 2, GLOBAL_LABEL_Y);
+        drawLeftAlignedLabel(graphics, Component.translatable("emf_distance_cutoff.animation_pause_distance_label"), left + 2, ANIMATION_LABEL_Y);
+    }
+
+    private void drawLeftAlignedLabel(GuiGraphicsExtractor graphics, Component text, int x, int y) {
+        graphics.centeredText(this.font, text, x + this.font.width(text) / 2, y, 0xFFFFFFFF);
     }
 }
