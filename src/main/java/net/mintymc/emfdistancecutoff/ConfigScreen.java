@@ -9,11 +9,11 @@ import net.minecraft.text.Text;
 import java.util.Locale;
 
 public final class ConfigScreen extends Screen {
-    private static final int TITLE_Y = 14;
-    private static final int GLOBAL_LABEL_Y = 40;
-    private static final int GLOBAL_FIELD_Y = 56;
-    private static final int ENTITY_LABEL_Y = 83;
-    private static final int SEARCH_Y = 100;
+    private static final int TITLE_Y = 10;
+    private static final int GLOBAL_LABEL_Y = 30;
+    private static final int GLOBAL_FIELD_Y = 42;
+    private static final int SEARCH_Y = 72;
+    private static final int ENTITY_LABEL_Y = 98;
 
     private final Screen parent;
     private final CutoffConfig config;
@@ -32,7 +32,7 @@ public final class ConfigScreen extends Screen {
         super.init();
 
         int center = this.width / 2;
-        int fieldWidth = Math.min(320, Math.max(180, this.width - 80));
+        int fieldWidth = Math.min(760, Math.max(300, this.width - 120));
         int left = center - fieldWidth / 2;
 
         globalDistanceField = new TextFieldWidget(this.textRenderer, left, GLOBAL_FIELD_Y, fieldWidth, 20,
@@ -50,25 +50,31 @@ public final class ConfigScreen extends Screen {
         searchField.setChangedListener(value -> { if (entityList != null) entityList.rebuild(value); });
         addDrawableChild(searchField);
 
-        int listTop = SEARCH_Y + 28;
-        int listBottom = this.height - 64;
-        int listWidth = Math.min(760, Math.max(220, this.width - 80));
+        int listTop = ENTITY_LABEL_Y + 18;
+        int listBottom = this.height - 58;
+        int listWidth = Math.min(1000, Math.max(300, this.width - 80));
         entityList = new EntityListWidget(this.client, listWidth, Math.max(80, listBottom - listTop), listTop, 28, this);
         entityList.rebuild(searchField.getText());
         addDrawableChild(entityList);
 
-        int buttonY = this.height - 50;
+        int buttonY = this.height - 40;
+        int resetWidth = 230;
+        int actionWidth = 130;
+        int gap = 10;
+        int totalWidth = resetWidth + actionWidth * 2 + gap * 2;
+        int buttonLeft = center - totalWidth / 2;
+
         addDrawableChild(ButtonWidget.builder(Text.translatable("emf_distance_cutoff.reset_all"), button -> {
             config.resetAll();
             globalDistanceField.setText(format(config.cutoffDistanceBlocks));
             if (entityList != null) entityList.rebuild(searchField.getText());
             CutoffConfig.save();
-        }).dimensions(center - 155, buttonY, 150, 20).build());
+        }).dimensions(buttonLeft, buttonY, resetWidth, 20).build());
 
         addDrawableChild(ButtonWidget.builder(Text.translatable("emf_distance_cutoff.save"), button -> saveAndClose())
-                .dimensions(center + 5, buttonY, 75, 20).build());
+                .dimensions(buttonLeft + resetWidth + gap, buttonY, actionWidth, 20).build());
         addDrawableChild(ButtonWidget.builder(Text.translatable("emf_distance_cutoff.cancel"), button -> close())
-                .dimensions(center + 85, buttonY, 75, 20).build());
+                .dimensions(buttonLeft + resetWidth + gap + actionWidth + gap, buttonY, actionWidth, 20).build());
     }
 
     private void saveAndClose() {
