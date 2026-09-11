@@ -13,9 +13,10 @@ public final class EMFDistanceCutoffMod implements ClientModInitializer {
         CutoffConfig.load();
         try {
             EMFAnimationApi.registerVanillaModelCondition(EMFDistanceCutoffMod::shouldUseVanillaModel);
+            EMFAnimationApi.registerPauseCondition(EMFDistanceCutoffMod::shouldPauseAnimations);
         } catch (Exception e) {
             throw new RuntimeException(
-                    "[emf_distance_cutoff] Failed to register the vanilla model condition with EMF. " +
+                    "[emf_distance_cutoff] Failed to register the EMF performance conditions. " +
                     "Make sure Entity Model Features is installed and up to date.", e);
         }
     }
@@ -36,11 +37,37 @@ public final class EMFDistanceCutoffMod implements ClientModInitializer {
 
         if (distance <= 0.0) return false;
 
+        return distanceSquared(entity, minecraft) > distance * distance;
+    }
+
+    private static Boolean shouldPauseAnimations(EMFEntity entity) {
+        Minecraft minecraft = Minecraft.getInstance();
+        if (minecraft.player == null) return false;
+
+        String entityId = EntityIdResolver.resolve(entity);
+        CutoffConfig config = CutoffConfig.get();
+        CutoffConfig.EntityOverride override = entityId == null ? null : config.getOverride(entityId);
+
+        if (override != null && !override.enabled) return false;
+
+        double modelDistance = override != null && override.distanceBlocks != null
+                ? override.distanceBlocks
+                : config.cutoffDistanceBlocks;
+        double pauseDistance = override != null && override.animationPauseDistanceBlocks != null
+                ? override.animationPauseDistanceBlocks
+                : config.animationPauseDistanceBlocks;
+
+        if (pauseDistance <= 0.0 || modelDistance <= 0.0) return false;
+        // Never pause outside the range where this mod still allows the EMF model.
+        if (pauseDistance >= modelDistance) return false;
+
+        return distanceSquared(entity, minecraft) >= pauseDistance * pauseDistance;
+    }
+
+    private static double distanceSquared(EMFEntity entity, Minecraft minecraft) {
         double dx = entity.emf$getX() - minecraft.player.getX();
         double dy = entity.emf$getY() - minecraft.player.getY();
         double dz = entity.emf$getZ() - minecraft.player.getZ();
-        double distanceSquared = dx * dx + dy * dy + dz * dz;
-
-        return distanceSquared > distance * distance;
+        return dx * dx + dy * dy + dz * dz;
     }
 }
